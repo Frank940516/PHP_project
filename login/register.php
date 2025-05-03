@@ -1,5 +1,5 @@
 <?php
-    require('db.inc');
+    require('../db.inc');
     mysqli_set_charset($link, 'utf8');
     session_start();
 ?>

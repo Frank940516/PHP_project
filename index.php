@@ -23,10 +23,10 @@
             <?php
                 if(isset($_SESSION["user"])){
                     echo "<span>歡迎" . htmlspecialchars($_SESSION["name"]) . "！</span>";
-                    echo "<input type='button' value='登出' onclick=\"location.href='logout.php'\">";
+                    echo "<input type='button' value='登出' onclick=\"location.href='login/logout.php'\">";
                 } else {
-                    echo "<input type='button' value='登入' onclick=\"location.href='login.php'\">";
-                    echo "<input type='button' value='註冊' onclick=\"location.href='register.php'\">";
+                    echo "<input type='button' value='登入' onclick=\"location.href='login/login.php'\">";
+                    echo "<input type='button' value='註冊' onclick=\"location.href='login/register.php'\">";
                 }
             ?>
         </div>

@@ -1,5 +1,5 @@
 <?php
-    require('db.inc');
+    require('../db.inc');
     mysqli_set_charset($link, 'utf8');
     session_start();
 ?>
@@ -25,7 +25,7 @@
                 if (mysqli_query($link, $insetsSql)) {
                     $_SESSION["user"] = $email;
                     $_SESSION["name"] = $name;
-                    header("Location: index.php"); // redirect to index page
+                    header("Location: ../index.php"); // redirect to index page
                     exit();
                 } else {
                     echo "Error: " . $insetsSql . "<br>" . mysqli_error($link);

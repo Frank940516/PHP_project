@@ -1,5 +1,5 @@
 <?php
-    require('db.inc');
+    require('../db.inc');
     mysqli_set_charset($link, 'utf8');
 ?>
 <html>
@@ -19,7 +19,7 @@
                     session_start();
                     $_SESSION["user"] = $row["Email"];
                     $_SESSION["name"] = $row["Name"];
-                    header("Location: index.php"); // redirect to index page
+                    header("Location: ../index.php"); // redirect to index page
                     exit();
                 } else { // password incorrect
                     //header("Location: login.php?error=password"); // redirect to login page with error
