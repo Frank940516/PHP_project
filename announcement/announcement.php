@@ -1,5 +1,6 @@
 <?php
 require('../db.inc');
+    require('../parsedown/Parsedown.php'); // 引入 Parsedown 類
 mysqli_set_charset($link, 'utf8');
 session_start();
 ?>
@@ -22,6 +23,17 @@ session_start();
             }
             tr:hover {
                 background-color: #f5f5f5;
+            }
+            .date-column {
+                width: 20%; /* 縮短公告時間列的寬度 */
+            }
+            .title-column {
+                width: 60%; /* 增加公告標題列的寬度 */
+                font-size: 18px; /* 增加字體大小 */
+                padding: 12px; /* 增加內邊距 */
+            }
+            .publisher-column {
+                width: 20%; /* 保持發布者列的寬度 */
             }
             .top-right-buttons {
                 position: absolute;
@@ -75,7 +87,7 @@ session_start();
         <!-- announcement area -->
         <?php
         // 查詢公告資料
-        $sql = "SELECT announcement.No, announcement.Title, announcement.Content, announcement.Date, accounts.Name AS PublisherName
+        $sql = "SELECT announcement.No, announcement.Title, announcement.Date, accounts.Name AS PublisherName
                 FROM announcement
                 JOIN accounts ON announcement.Publisher = accounts.No
                 ORDER BY Date DESC";
@@ -90,10 +102,9 @@ session_start();
         <table>
             <thead>
                 <tr>
-                    <th>公告日期</th>
-                    <th>公告標題</th>
-                    <th>公告內容</th>
-                    <th>發布者</th>
+                    <th class="date-column">公告時間</th>
+                    <th class="title-column">公告標題</th>
+                    <th class="publisher-column">發布者</th>
                 </tr>
             </thead>
             <tbody>
@@ -101,18 +112,17 @@ session_start();
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['Date']) . "</td>";
+                        echo "<td class='date-column'>" . htmlspecialchars($row['Date']) . "</td>";
                         echo "<td class='title-column'>
                                 <a href='detail.php?No=" . htmlspecialchars($row['No']) . "&Title=" . urlencode($row['Title']) . "'>
                                     " . htmlspecialchars($row['Title']) . "
                                 </a>
                               </td>";
-                        echo "<td>" . nl2br(htmlspecialchars($row['Content'])) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['PublisherName']) . "</td>";
+                        echo "<td class='publisher-column'>" . htmlspecialchars($row['PublisherName']) . "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='4'>目前沒有公告</td></tr>";
+                    echo "<tr><td colspan='3'>目前沒有公告</td></tr>";
                 }
                 ?>
             </tbody>
