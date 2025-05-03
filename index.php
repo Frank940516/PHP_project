@@ -16,6 +16,14 @@
             .top-right-buttons input {
                 margin: 5px;
             }
+            .left-buttons {  /* announcement button */
+                position: absolute;
+                top: 10px;
+                left: 10px;
+            }
+            .left-buttons input {
+                margin: 5px;
+            }
         </style>
     </head>
     <body>
@@ -29,6 +37,9 @@
                     echo "<input type='button' value='註冊' onclick=\"location.href='login/register.php'\">";
                 }
             ?>
+        </div>
+        <div class="left-buttons">
+            <input type="button" value="公告" onclick="location.href='announcement/announcement.php'">
         </div>
     </body>
 </html>

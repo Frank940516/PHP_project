@@ -19,10 +19,11 @@
                     session_start();
                     $_SESSION["user"] = $row["Email"];
                     $_SESSION["name"] = $row["Name"];
+                    $_SESSION["type"] = $row["Type"];
                     header("Location: ../index.php"); // redirect to index page
                     exit();
                 } else { // password incorrect
-                    //header("Location: login.php?error=password"); // redirect to login page with error
+                    header("Location: login.php?error=password"); // redirect to login page with error
                     exit();
                 }
             } else { // account does not exist
