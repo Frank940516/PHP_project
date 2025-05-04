@@ -1,6 +1,7 @@
 <?php
 require('../db.inc');
 mysqli_set_charset($link, 'utf8');
+date_default_timezone_set('Asia/Taipei');
 session_start();
 
 // 檢查是否為管理員
@@ -119,6 +120,8 @@ if (!$announcement) {
 
                 <input type="submit" value="更新公告">
             </form>
+            <!-- 返回公告細節按鈕 -->
+    <a href="detail.php?No=<?php echo htmlspecialchars($announcementNo); ?>" style="display: inline-block; padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">返回公告細節</a>
         </div>
     </body>
 </html>

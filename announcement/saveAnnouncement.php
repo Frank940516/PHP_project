@@ -1,6 +1,7 @@
 <?php
 require('../db.inc');
 mysqli_set_charset($link, 'utf8');
+date_default_timezone_set('Asia/Taipei');
 session_start();
 
 // 檢查是否為管理員

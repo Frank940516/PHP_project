@@ -1,6 +1,7 @@
 <?php
 require('../db.inc');
 mysqli_set_charset($link, 'utf8');
+date_default_timezone_set('Asia/Taipei');
 session_start();
 
 // 檢查是否為管理員
@@ -101,6 +102,8 @@ if (!isset($_SESSION["type"]) || $_SESSION["type"] !== "Admin") {
 
                 <input type="submit" value="發布公告">
             </form>
+            <!-- 返回公告列表按鈕 -->
+            <a href="announcement.php" style="display: inline-block; padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">返回公告列表</a>
         </div>
     </body>
 </html>

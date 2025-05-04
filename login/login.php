@@ -18,9 +18,12 @@
                 echo "<p style='color: red;'>帳號不存在！</p>";
             }
         }
-        echo "<form action='loginCheck.php' method='post'>";
-        echo "郵件：<input type='text' name='email' required><br>";
-        echo "密碼：<input type='password' name='password' required><br>";
-        echo "<input type='submit' value='登入'>"."沒有帳號嗎?請<a href='register.php'>註冊</a>";
         ?>
-    </body> 
+        <form action="loginCheck.php" method="POST">
+            <input type="hidden" name="redirect" value="<?php echo isset($_GET['redirect']) ? htmlspecialchars($_GET['redirect']) : '../index.php'; ?>">
+            郵件：<input type='text' name='email' required><br>
+            密碼：<input type='password' name='password' required><br>
+            <input type='submit' value='登入'>沒有帳號嗎?請<a href='register.php'>註冊</a>
+        </form>
+    </body>
+</html>

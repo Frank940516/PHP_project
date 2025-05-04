@@ -1,7 +1,9 @@
 <?php
     require('../db.inc');
+    require('../authCheck.php'); 
     require('../parsedown/Parsedown.php'); // 引入 Parsedown 類
     mysqli_set_charset($link, 'utf8');
+    date_default_timezone_set('Asia/Taipei');
     session_start();
 
     $announcementNo = isset($_GET['No']) ? intval($_GET['No']) : 0;
@@ -71,7 +73,7 @@
                 border-left: 4px solid #4CAF50;
                 border-radius: 4px;
             }
-            .back-button {
+            .back-button, .edit-button {
                 display: inline-block;
                 margin-top: 20px;
                 padding: 10px 15px;
@@ -82,12 +84,37 @@
                 border-radius: 4px;
                 transition: background-color 0.3s ease;
             }
-            .back-button:hover {
+            .back-button:hover, .edit-button:hover {
                 background-color: #45a049;
+            }
+            .top-right-buttons {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+            .top-right-buttons input {
+                margin-left: 10px;
+                padding: 5px 10px;
+                font-size: 14px;
+                cursor: pointer;
             }
         </style>
     </head>
     <body>
+        <!-- 登入/登出按鈕 -->
+        <div class="top-right-buttons">
+            <?php
+                if (!isset($_SESSION["user"])) {
+                    $currentUrl = urlencode($_SERVER['REQUEST_URI']); // 將當前頁面 URL 編碼
+                    echo "<input type='button' value='登入' onclick=\"location.href='../login/login.php?redirect=$currentUrl'\">";
+                    echo "<input type='button' value='註冊' onclick=\"location.href='../login/register.php'\">";
+                } else {
+                    echo "<span>歡迎 " . htmlspecialchars($_SESSION["name"]) . "！</span>";
+                    echo "<input type='button' value='登出' onclick=\"location.href='../login/logout.php'\">";
+                }
+            ?>
+        </div>
+
         <div class="container">
             <h1><?php echo $pageTitle; ?></h1>
             <div class="meta">
