@@ -67,5 +67,30 @@ if (isset($_SESSION["user"])) {
         });
     </script>
     <?php
-} 
+} else {
+    ?>
+    <div class="auth-buttons">
+        <a href="/login/register.php" class="auth-button">註冊</a>
+        <a href="/login/login.php" class="auth-button">登入</a>
+    </div>
+    <style>
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .auth-button {
+            text-decoration: none;
+            color: white;
+            background-color: #007BFF;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .auth-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <?php
+}
 ?>

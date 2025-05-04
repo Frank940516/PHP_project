@@ -1,8 +1,7 @@
 <?php
 require('../db.inc'); // 資料庫連線檔案
-require('../userMenu.php'); // 引入使用者功能清單
+require('../authCheck.php'); 
 mysqli_set_charset($link, 'utf8');
-session_start();
 
 // 檢查是否登入
 if (!isset($_SESSION['user'])) {
@@ -155,7 +154,7 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
                         <td><?php echo htmlspecialchars($product['price']); ?></td>
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
                         <td><?php echo htmlspecialchars($product['condition']); ?></td>
-                        <td><?php echo htmlspecialchars($product['description']); ?></td>
+                        <td><?php echo nl2br(htmlspecialchars($product['description'])); ?></td>
                         <td class="action-buttons">
                             <a href="edit.php?id=<?php echo $product['id']; ?>">編輯</a>
                             <a href="delete.php?id=<?php echo $product['id']; ?>" class="delete-button" onclick="return confirm('確定要刪除此商品嗎？');">刪除</a>

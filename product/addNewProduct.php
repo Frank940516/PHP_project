@@ -1,8 +1,7 @@
 <?php
 require('../db.inc'); // 資料庫連線檔案
-require('../userMenu.php'); // 引入使用者功能清單
+require('../authCheck.php'); 
 mysqli_set_charset($link, 'utf8');
-session_start();
 
 // 檢查是否登入
 if (!isset($_SESSION['user'])) {

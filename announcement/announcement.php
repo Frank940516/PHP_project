@@ -1,6 +1,5 @@
 <?php
 require('../db.inc');
-require('../authCheck.php'); 
 require('../parsedown/Parsedown.php'); // 引入 Parsedown 類
 mysqli_set_charset($link, 'utf8');
 date_default_timezone_set('Asia/Taipei');
