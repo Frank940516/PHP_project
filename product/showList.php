@@ -28,7 +28,7 @@ if (!$user) {
 $userId = $user['No'];
 
 // 查詢使用者上架的商品
-$sqlProducts = "SELECT id, name, price, stock, `condition`, description 
+$sqlProducts = "SELECT id, name, price, stock, `condition`, description, attachment 
                 FROM products 
                 WHERE seller_id = ?";
 $stmtProducts = mysqli_prepare($link, $sqlProducts);
@@ -61,6 +61,23 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
             font-size: 14px;
             cursor: pointer;
         }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .add-product-button {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .add-product-button:hover {
+            background-color: #218838;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -90,6 +107,10 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
         .delete-button:hover {
             background-color: #c82333;
         }
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
     </style>
 </head>
 <body>
@@ -101,10 +122,16 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
         <?php require('../userMenu.php'); ?>
     </div>
 
-    <h1>我的商品列表</h1>
+    <!-- Header with title and add product button -->
+    <div class="header-container">
+        <h1>我的商品列表</h1>
+        <a href="addNewProduct.php" class="add-product-button">新增商品</a>
+    </div>
+
     <table>
         <thead>
             <tr>
+                <th>圖片</th>
                 <th>商品名稱</th>
                 <th>價格</th>
                 <th>庫存</th>
@@ -117,20 +144,27 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
                     <tr>
+                        <td>
+                            <?php if (!empty($product['attachment'])): ?>
+                                <img src="pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="商品圖片" class="product-image">
+                            <?php else: ?>
+                                無圖片
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($product['name']); ?></td>
                         <td><?php echo htmlspecialchars($product['price']); ?></td>
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
                         <td><?php echo htmlspecialchars($product['condition']); ?></td>
                         <td><?php echo htmlspecialchars($product['description']); ?></td>
                         <td class="action-buttons">
-                            <a href="editProduct.php?id=<?php echo $product['id']; ?>">編輯</a>
-                            <a href="deleteProduct.php?id=<?php echo $product['id']; ?>" class="delete-button" onclick="return confirm('確定要刪除此商品嗎？');">刪除</a>
+                            <a href="edit.php?id=<?php echo $product['id']; ?>">編輯</a>
+                            <a href="delete.php?id=<?php echo $product['id']; ?>" class="delete-button" onclick="return confirm('確定要刪除此商品嗎？');">刪除</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="6">目前沒有上架的商品。</td>
+                    <td colspan="7">目前沒有上架的商品。</td>
                 </tr>
             <?php endif; ?>
         </tbody>
