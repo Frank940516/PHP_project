@@ -70,16 +70,7 @@ session_start();
     <body>
         <!-- login & register button -->
         <div class="top-right-buttons">
-            <?php
-                if (!isset($_SESSION["user"])) {
-                    $currentUrl = urlencode($_SERVER['REQUEST_URI']); // 將當前頁面 URL 編碼
-                    echo "<input type='button' value='登入' onclick=\"location.href='../login/login.php?redirect=$currentUrl'\">";
-                    echo "<input type='button' value='註冊' onclick=\"location.href='../login/register.php'\">";
-                } else {
-                    echo "<span>歡迎 " . htmlspecialchars($_SESSION["name"]) . "！</span>";
-                    echo "<input type='button' value='登出' onclick=\"location.href='../login/logout.php'\">";
-                }
-            ?>
+            <?php include('../userMenu.php'); ?>
         </div>
 
         <!-- 公告列表標題和新增公告按鈕 -->

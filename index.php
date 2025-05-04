@@ -13,33 +13,19 @@
                 top: 10px;
                 right: 10px;
             }
-            .top-right-buttons input {
-                margin: 5px;
-            }
-            .left-buttons {  /* announcement button */
-                position: absolute;
-                top: 10px;
-                left: 10px;
-            }
-            .left-buttons input {
-                margin: 5px;
-            }
         </style>
     </head>
     <body>
         <div class="top-right-buttons">
-            <?php
-                if(isset($_SESSION["user"])){
-                    echo "<span>歡迎" . htmlspecialchars($_SESSION["name"]) . "！</span>";
-                    echo "<input type='button' value='登出' onclick=\"location.href='login/logout.php'\">";
-                } else {
-                    echo "<input type='button' value='登入' onclick=\"location.href='login/login.php'\">";
-                    echo "<input type='button' value='註冊' onclick=\"location.href='login/register.php'\">";
-                }
-            ?>
+            <?php include('userMenu.php');?>
         </div>
         <div class="left-buttons">
             <input type="button" value="公告" onclick="location.href='announcement/announcement.php'">
+            <!-- 新增搜尋欄和搜尋按鈕 -->
+            <form action="announcement/search.php" method="GET" style="display: inline;">
+                <input type="text" name="query" placeholder="搜尋書籍..." style="padding: 5px; width: 200px; border: 1px solid #ccc; border-radius: 4px;">
+                <input type="submit" value="搜尋" style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            </form>
         </div>
     </body>
 </html>
