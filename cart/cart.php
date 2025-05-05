@@ -26,11 +26,14 @@ if (!$user) {
 
 $userId = $user['No'];
 
-// 查詢購物車內容
-$sqlCart = "SELECT c.id AS cart_id, p.name AS product_name, p.price, c.quantity, (p.price * c.quantity) AS subtotal
+// 查詢購物車內容，並整合同件商品（同賣家）
+$sqlCart = "SELECT c.product_id, p.name AS product_name, p.price, p.attachment, SUM(c.quantity) AS total_quantity, 
+                   (p.price * SUM(c.quantity)) AS subtotal, a.Name AS seller_name
             FROM cart c
             JOIN products p ON c.product_id = p.id
-            WHERE c.user_id = ?";
+            JOIN accounts a ON p.seller_id = a.No
+            WHERE c.user_id = ?
+            GROUP BY c.product_id, p.name, p.price, p.attachment, a.Name";
 $stmtCart = mysqli_prepare($link, $sqlCart);
 mysqli_stmt_bind_param($stmtCart, 'i', $userId);
 mysqli_stmt_execute($stmtCart);
@@ -48,7 +51,7 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>購物車</title>
+    <title>訂單管理</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -80,6 +83,11 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
             font-weight: bold;
             text-align: right;
         }
+        .product-image {
+            width: 100x;
+            height: 100px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -91,11 +99,13 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
         <?php require('../userMenu.php'); ?>
     </div>
 
-    <h1>購物車</h1>
+    <h1>訂單管理</h1>
     <table>
         <thead>
             <tr>
+                <th>圖片</th>
                 <th>商品名稱</th>
+                <th>賣家</th>
                 <th>價格</th>
                 <th>數量</th>
                 <th>小計</th>
@@ -106,24 +116,28 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
             <?php if (!empty($cartItems)): ?>
                 <?php foreach ($cartItems as $item): ?>
                     <tr>
+                        <td>
+                            <img src="../product/pic/<?php echo htmlspecialchars($item['attachment']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="product-image">
+                        </td>
                         <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                        <td><?php echo htmlspecialchars($item['seller_name']); ?></td>
                         <td><?php echo htmlspecialchars($item['price']); ?></td>
-                        <td><?php echo htmlspecialchars($item['quantity']); ?></td>
+                        <td><?php echo htmlspecialchars($item['total_quantity']); ?></td>
                         <td><?php echo htmlspecialchars($item['subtotal']); ?></td>
                         <td>
-                            <a href="delete.php?id=<?php echo $item['cart_id']; ?>">刪除</a>
+                            <a href="delete.php?product_id=<?php echo $item['product_id']; ?>">刪除</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5">購物車是空的</td>
+                    <td colspan="7">購物車是空的</td>
                 </tr>
             <?php endif; ?>
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="3" class="total">總金額：</td>
+                <td colspan="5" class="total">總金額：</td>
                 <td colspan="2"><?php echo $total; ?></td>
             </tr>
         </tfoot>

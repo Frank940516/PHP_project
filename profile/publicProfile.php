@@ -1,20 +1,44 @@
 <?php
-    require('db.inc');
-    mysqli_set_charset($link, 'utf8');
-    session_start();
+require('../db.inc');
+mysqli_set_charset($link, 'utf8');
+session_start();
 
-    // 查詢所有有庫存的商品
-    $sql = "SELECT id, name, price, attachment FROM products WHERE stock > 0";
-    $result = mysqli_query($link, $sql);
-    $products = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $products[] = $row;
-    }
+// 確認賣家 ID 是否存在
+if (!isset($_GET['seller_id'])) {
+    echo "賣家 ID 不存在！";
+    exit();
+}
+
+$sellerId = $_GET['seller_id'];
+
+// 查詢賣家名稱
+$sqlSeller = "SELECT Name FROM accounts WHERE No = ?";
+$stmtSeller = mysqli_prepare($link, $sqlSeller);
+mysqli_stmt_bind_param($stmtSeller, 'i', $sellerId);
+mysqli_stmt_execute($stmtSeller);
+$resultSeller = mysqli_stmt_get_result($stmtSeller);
+$seller = mysqli_fetch_assoc($resultSeller);
+
+if (!$seller) {
+    echo "賣家不存在！";
+    exit();
+}
+
+// 查詢賣家販售的商品
+$sqlProducts = "SELECT id, name, price, stock, attachment FROM products WHERE seller_id = ? AND stock > 0";
+$stmtProducts = mysqli_prepare($link, $sqlProducts);
+mysqli_stmt_bind_param($stmtProducts, 'i', $sellerId);
+mysqli_stmt_execute($stmtProducts);
+$resultProducts = mysqli_stmt_get_result($stmtProducts);
+$products = [];
+while ($row = mysqli_fetch_assoc($resultProducts)) {
+    $products[] = $row;
+}
 ?>
 <html>
     <meta charset="UTF-8">
     <head>
-        <title>二手書交易平台-首頁</title>
+        <title><?php echo htmlspecialchars($seller['Name']); ?> 的商場</title>
         <style>
             .top-bar {
                 display: flex;
@@ -24,17 +48,15 @@
                 background-color: #f8f9fa;
                 border-bottom: 1px solid #ddd;
             }
-            .announcement-button {
-                background-color: #007BFF;
+            .back-home-button {
+                text-decoration: none;
                 color: white;
+                background-color: #007BFF;
                 padding: 10px 15px;
-                border: none;
                 border-radius: 5px;
                 font-size: 14px;
-                cursor: pointer;
-                text-decoration: none;
             }
-            .announcement-button:hover {
+            .back-home-button:hover {
                 background-color: #0056b3;
             }
             .top-right-buttons {
@@ -77,43 +99,37 @@
                 margin: 10px 0;
             }
             .product-item a {
-                display: inline-block;
-                margin: 10px 0;
-                padding: 8px 15px;
-                background-color: #4CAF50;
-                color: white;
-                text-decoration: none;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            .product-item a:hover {
-                background-color: #45a049;
+                text-decoration: underline;
+                color: blue;
             }
         </style>
     </head>
     <body>
         <div class="top-bar">
-            <a href="announcement/announcement.php" class="announcement-button">公告</a>
+            <a href="../index.php" class="back-home-button">返回首頁</a>
             <div class="top-right-buttons">
-                <?php include('userMenu.php'); ?>
+                <?php include('../userMenu.php'); ?>
             </div>
         </div>
-        <h1 style="text-align: center;">二手書交易平台</h1>
+        <h1 style="text-align: center;"><?php echo htmlspecialchars($seller['Name']); ?> 的商場</h1>
         <div class="product-grid">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
                     <div class="product-item">
-                        <img src="product/pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <img src="../product/pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                         <h3>
-                            <a href="product/detail.php?id=<?php echo $product['id']; ?>" style="text-decoration: underline; color: blue;">
+                            <a href="../product/detail.php?id=<?php echo $product['id']; ?>">
                                 <?php echo htmlspecialchars($product['name']); ?>
                             </a>
                         </h3>
                         <p class="price">$<?php echo htmlspecialchars($product['price']); ?></p>
+                        <?php if ($product['stock'] == 0): ?>
+                            <p style="color: red; font-weight: bold;">售完</p>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p style="text-align: center;">目前沒有商品。</p>
+                <p style="text-align: center;">該賣家目前沒有商品。</p>
             <?php endif; ?>
         </div>
     </body>
