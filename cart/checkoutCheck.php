@@ -26,13 +26,20 @@ if (!$user) {
 
 $userId = $user['No'];
 
-// 獲取商品數據
-if (!isset($_POST['products']) || !is_array($_POST['products'])) {
+// 檢查是否是單一商品結帳
+if (isset($_POST['product_id']) && isset($_POST['quantity'])) {
+    $products = [
+        [
+            'product_id' => intval($_POST['product_id']),
+            'quantity' => intval($_POST['quantity']),
+        ]
+    ];
+} elseif (isset($_POST['products']) && is_array($_POST['products'])) {
+    $products = $_POST['products'];
+} else {
     echo "缺少必要的參數！";
     exit();
 }
-
-$products = $_POST['products']; // 格式：[ ['product_id' => 1, 'quantity' => 2], ... ]
 
 $totalAmount = 0; // 訂單總金額
 $orderItems = []; // 訂單商品明細

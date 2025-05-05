@@ -31,7 +31,7 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
-$productId = $_GET['id'];
+$productId = intval($_GET['id']);
 
 // 查詢商品資料
 $sqlProduct = "SELECT attachment FROM products WHERE id = ? AND seller_id = ?";
@@ -46,23 +46,15 @@ if (!$product) {
     exit();
 }
 
-// 刪除商品圖片
-if (!empty($product['attachment'])) {
-    $filePath = '../pic/' . $product['attachment'];
-    if (file_exists($filePath)) {
-        unlink($filePath); // 刪除圖片檔案
-    }
-}
+// 標記商品為已刪除
+$sqlMarkDeleted = "UPDATE products SET is_deleted = 1 WHERE id = ? AND seller_id = ?";
+$stmtMarkDeleted = mysqli_prepare($link, $sqlMarkDeleted);
+mysqli_stmt_bind_param($stmtMarkDeleted, 'ii', $productId, $userId);
+mysqli_stmt_execute($stmtMarkDeleted);
 
-// 刪除商品資料
-$sqlDelete = "DELETE FROM products WHERE id = ? AND seller_id = ?";
-$stmtDelete = mysqli_prepare($link, $sqlDelete);
-mysqli_stmt_bind_param($stmtDelete, 'ii', $productId, $userId);
-mysqli_stmt_execute($stmtDelete);
-
-if (mysqli_stmt_affected_rows($stmtDelete) > 0) {
-    echo "<script>alert('商品刪除成功！'); location.href='showList.php';</script>";
+if (mysqli_stmt_affected_rows($stmtMarkDeleted) > 0) {
+    echo "<script>alert('商品已成功移除！'); location.href='showList.php';</script>";
 } else {
-    echo "<script>alert('商品刪除失敗！'); history.back();</script>";
+    echo "<script>alert('商品移除失敗！'); history.back();</script>";
 }
 ?>

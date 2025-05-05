@@ -36,9 +36,11 @@ if (!isset($_POST['product_id'])) {
 $productId = intval($_POST['product_id']);
 
 // 查詢商品細節
-$sqlProduct = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, c.quantity 
+$sqlProduct = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, c.quantity, 
+                      a.Name AS seller_name  -- 新增賣家名稱
                FROM products p
                JOIN cart c ON p.id = c.product_id
+               JOIN accounts a ON p.seller_id = a.No  -- 連接賣家帳戶
                WHERE c.user_id = ? AND p.id = ?";
 $stmtProduct = mysqli_prepare($link, $sqlProduct);
 mysqli_stmt_bind_param($stmtProduct, 'ii', $userId, $productId);
@@ -106,6 +108,7 @@ if (!$product) {
             <th>小計</th>
             <th>庫存</th>
             <th>描述</th>
+            <th>賣家</th> <!-- 新增賣家欄位 -->
         </tr>
         <tr>
             <td>
@@ -117,6 +120,7 @@ if (!$product) {
             <td><?php echo htmlspecialchars($product['price'] * $product['quantity']); ?></td>
             <td><?php echo htmlspecialchars($product['stock']); ?></td>
             <td><?php echo htmlspecialchars($product['description']); ?></td>
+            <td><?php echo htmlspecialchars($product['seller_name']); ?></td> <!-- 顯示賣家名稱 -->
         </tr>
     </table>
 

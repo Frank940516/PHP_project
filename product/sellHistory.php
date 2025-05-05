@@ -1,5 +1,4 @@
 <?php
-// filepath: c:\xampp\htdocs\product\sellHistory.php
 require('../db.inc');
 mysqli_set_charset($link, 'utf8');
 session_start();
@@ -102,6 +101,11 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
         .product-link:hover, .buyer-link:hover {
             text-decoration: underline;
         }
+        .total-row {
+            font-weight: bold;
+            text-align: right;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -116,9 +120,20 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
     <?php if (!empty($sellRecords)): ?>
         <?php 
         $currentProductId = null;
+        $productTotal = 0; // 用於計算每個商品的總金額
         foreach ($sellRecords as $record): 
         ?>
             <?php if ($currentProductId !== $record['product_id']): ?>
+                <?php if ($currentProductId !== null): ?>
+                    <!-- 顯示上一個商品的總金額 -->
+                    <tr class="total-row">
+                        <td colspan="5">總金額：</td>
+                        <td><?php echo htmlspecialchars($productTotal); ?></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <?php $productTotal = 0; // 重置總金額 ?>
+                <?php endif; ?>
                 <div class="product-header">
                     <span>商品名稱：<a href="detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></span>
                 </div>
@@ -150,7 +165,13 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
                             <td><?php echo htmlspecialchars($record['price']); ?></td>
                             <td><?php echo htmlspecialchars($record['subtotal']); ?></td>
                         </tr>
+                        <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
             <?php if (end($sellRecords) === $record || $currentProductId !== $sellRecords[array_search($record, $sellRecords) + 1]['product_id']): ?>
+                    <!-- 顯示最後一個商品的總金額 -->
+                    <tr class="total-row">
+                        <td colspan="5">總金額：</td>
+                        <td><?php echo htmlspecialchars($productTotal); ?></td>
+                    </tr>
                     </tbody>
                 </table>
             <?php endif; ?>

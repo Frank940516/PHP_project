@@ -29,20 +29,23 @@ $userId = $user['No'];
 
 // 查詢購買紀錄
 $sqlHistory = "SELECT o.id AS order_id, o.total_amount, o.created_at, 
-                      oi.product_id, p.name AS product_name, p.attachment, oi.quantity, oi.price, oi.subtotal
+                      oi.product_id, p.name AS product_name, p.attachment, p.is_deleted, 
+                      oi.quantity, oi.price, oi.subtotal, 
+                      a.No AS seller_id, a.Name AS seller_name  -- 新增 seller_id
                FROM orders o
                JOIN order_items oi ON o.id = oi.order_id
                JOIN products p ON oi.product_id = p.id
+               JOIN accounts a ON p.seller_id = a.No  -- 連接賣家帳戶
                WHERE o.user_id = ?
-               ORDER BY o.created_at DESC";
+               ORDER BY p.name ASC, o.created_at DESC";
 $stmtHistory = mysqli_prepare($link, $sqlHistory);
 mysqli_stmt_bind_param($stmtHistory, 'i', $userId);
 mysqli_stmt_execute($stmtHistory);
 $resultHistory = mysqli_stmt_get_result($stmtHistory);
 
-$orders = [];
+$buyRecords = [];
 while ($row = mysqli_fetch_assoc($resultHistory)) {
-    $orders[] = $row;
+    $buyRecords[] = $row;
 }
 ?>
 
@@ -84,7 +87,7 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
         th {
             background-color: #f2f2f2;
         }
-        .order-header {
+        .product-header {
             background-color: #e9ecef;
             font-weight: bold;
             padding: 10px;
@@ -100,6 +103,15 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
         .product-link:hover {
             text-decoration: underline;
         }
+        .deleted-product {
+            color: #e74c3c;
+            font-style: italic;
+        }
+        .total-row {
+            font-weight: bold;
+            text-align: right;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -111,43 +123,63 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
     </div>
 
     <h1>購買紀錄</h1>
-    <?php if (!empty($orders)): ?>
+    <?php if (!empty($buyRecords)): ?>
         <?php 
-        $currentOrderId = null;
-        foreach ($orders as $order): 
+        $currentProductId = null;
+        $productTotal = 0; // 用於計算每個商品的總金額
+        foreach ($buyRecords as $record): 
         ?>
-            <?php if ($currentOrderId !== $order['order_id']): ?>
-                <div class="order-header">
-                    <span>購買時間：<?php echo htmlspecialchars($order['created_at']); ?></span>
-                    <span style="float: right;">訂單總金額：<?php echo htmlspecialchars($order['total_amount']); ?></span>
+            <?php if ($currentProductId !== $record['product_id']): ?>
+                <?php if ($currentProductId !== null): ?>
+                </table>
+                <?php $productTotal = 0; // 重置總金額 ?>
+                <?php endif; ?>
+                <div class="product-header">
+                    <span>商品名稱：
+                        <?php if ($record['is_deleted']): ?>
+                            <span class="deleted-product">商品已被賣家移除</span>
+                        <?php else: ?>
+                            <a href="../product/detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link">
+                                <?php echo htmlspecialchars($record['product_name']); ?>
+                            </a>
+                        <?php endif; ?>
+                    </span>
                 </div>
-                <?php $currentOrderId = $order['order_id']; ?>
                 <table>
                     <thead>
                         <tr>
                             <th>圖片</th>
-                            <th>商品名稱</th>
+                            <th>賣家</th> <!-- 新增賣家欄位 -->
+                            <th>購買時間</th>
                             <th>數量</th>
                             <th>單價</th>
                             <th>小計</th>
                         </tr>
                     </thead>
                     <tbody>
+                <?php $currentProductId = $record['product_id']; ?>
             <?php endif; ?>
                         <tr>
                             <td>
-                                <img src="../product/pic/<?php echo htmlspecialchars($order['attachment']); ?>" alt="<?php echo htmlspecialchars($order['product_name']); ?>" class="product-image">
+                                <img src="../product/pic/<?php echo htmlspecialchars($record['attachment']); ?>" alt="<?php echo htmlspecialchars($record['product_name']); ?>" class="product-image">
                             </td>
                             <td>
-                                <a href="../product/detail.php?id=<?php echo htmlspecialchars($order['product_id']); ?>" class="product-link">
-                                    <?php echo htmlspecialchars($order['product_name']); ?>
+                                <a href="../profile/publicProfile.php?seller_id=<?php echo htmlspecialchars($record['seller_id']); ?>" class="seller-link">
+                                    <?php echo htmlspecialchars($record['seller_name']); ?>
                                 </a>
                             </td>
-                            <td><?php echo htmlspecialchars($order['quantity']); ?></td>
-                            <td><?php echo htmlspecialchars($order['price']); ?></td>
-                            <td><?php echo htmlspecialchars($order['subtotal']); ?></td>
+                            <td><?php echo htmlspecialchars($record['created_at']); ?></td>
+                            <td><?php echo htmlspecialchars($record['quantity']); ?></td>
+                            <td><?php echo htmlspecialchars($record['price']); ?></td>
+                            <td><?php echo htmlspecialchars($record['subtotal']); ?></td>
                         </tr>
-            <?php if (end($orders) === $order || $currentOrderId !== $orders[array_search($order, $orders) + 1]['order_id']): ?>
+                        <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
+            <?php if (end($buyRecords) === $record || $currentProductId !== $buyRecords[array_search($record, $buyRecords) + 1]['product_id']): ?>
+                    <!-- 顯示最後一個商品的總金額 -->
+                    <tr class="total-row">
+                        <td colspan="6">總金額：</td>
+                        <td><?php echo htmlspecialchars($productTotal); ?></td>
+                    </tr>
                     </tbody>
                 </table>
             <?php endif; ?>

@@ -29,7 +29,7 @@ $userId = $user['No'];
 // 查詢使用者上架的商品
 $sqlProducts = "SELECT id, name, price, stock, `condition`, description, attachment 
                 FROM products 
-                WHERE seller_id = ?";
+                WHERE seller_id = ? AND is_deleted = 0"; // 新增條件 is_deleted = 0
 $stmtProducts = mysqli_prepare($link, $sqlProducts);
 mysqli_stmt_bind_param($stmtProducts, 'i', $userId);
 mysqli_stmt_execute($stmtProducts);
