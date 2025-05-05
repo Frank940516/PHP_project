@@ -55,13 +55,6 @@ if ($quantity > $product['stock']) {
     exit();
 }
 
-// 更新商品庫存
-$newStock = $product['stock'] - $quantity;
-$sqlUpdateStock = "UPDATE products SET stock = ? WHERE id = ?";
-$stmtUpdateStock = mysqli_prepare($link, $sqlUpdateStock);
-mysqli_stmt_bind_param($stmtUpdateStock, 'ii', $newStock, $productId);
-mysqli_stmt_execute($stmtUpdateStock);
-
 // 將商品加入購物車（假設購物車資料表為 `cart`）
 $sqlAddToCart = "INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)
                  ON DUPLICATE KEY UPDATE quantity = quantity + ?";

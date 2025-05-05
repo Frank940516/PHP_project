@@ -1,4 +1,5 @@
 <?php
+// filepath: c:\xampp\htdocs\login\logout.php
 session_start();
 session_unset();
 session_destroy();
@@ -13,15 +14,23 @@ $protectedFolders = [
     '/cart/',
 ];
 
-// 如果前一頁的路徑包含受保護的資料夾，轉導至首頁
+// 確保 $previousPage 是安全的 URL
+$path = parse_url($previousPage, PHP_URL_PATH);
+$isProtected = false;
+
 foreach ($protectedFolders as $folder) {
-    if (strpos($path, $folder) !== false) {
-        header("Location: ../index.php");
-        exit();
+    if (strpos($path, $folder) === 0) {
+        $isProtected = true;
+        break;
     }
 }
 
-// 否則轉導回前一頁
-header("Location: $previousPage");
+// 如果前一頁是受保護的頁面，轉導至首頁
+if ($isProtected) {
+    header("Location: ../index.php");
+} else {
+    // 否則轉導回前一頁
+    header("Location: $previousPage");
+}
 exit();
 ?>

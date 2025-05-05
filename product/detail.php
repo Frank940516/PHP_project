@@ -26,6 +26,30 @@ if (!$product) {
     echo "商品不存在！";
     exit();
 }
+
+// 確認使用者是否登入
+if (!isset($_SESSION['user'])) {
+    echo "請先登入！";
+    exit();
+}
+
+// 從 Session 中取得使用者 Email
+$userEmail = $_SESSION['user'];
+
+// 查詢目前登入使用者的 ID
+$sqlUser = "SELECT No FROM accounts WHERE Email = ?";
+$stmtUser = mysqli_prepare($link, $sqlUser);
+mysqli_stmt_bind_param($stmtUser, 's', $userEmail);
+mysqli_stmt_execute($stmtUser);
+$resultUser = mysqli_stmt_get_result($stmtUser);
+$user = mysqli_fetch_assoc($resultUser);
+
+if (!$user) {
+    echo "使用者不存在！";
+    exit();
+}
+
+$userId = $user['No'];
 ?>
 <html>
     <meta charset="UTF-8">
@@ -92,6 +116,10 @@ if (!$product) {
                 color: #2ecc71;
                 margin-bottom: 10px;
             }
+            .product-info .stock.sold-out {
+                color: #e74c3c;
+                font-weight: bold;
+            }
             .product-info .description {
                 margin-bottom: 20px;
                 line-height: 1.5;
@@ -139,21 +167,32 @@ if (!$product) {
                 <div class="product-info">
                     <h1><?php echo htmlspecialchars($product['name']); ?></h1>
                     <p class="price">價格：$<?php echo htmlspecialchars($product['price']); ?></p>
-                    <p class="stock">庫存：<?php echo htmlspecialchars($product['stock']); ?> 件</p>
+                    <p class="stock <?php echo $product['stock'] == 0 ? 'sold-out' : ''; ?>">
+                        <?php echo $product['stock'] == 0 ? '售完' : '庫存：' . htmlspecialchars($product['stock']) . ' 件'; ?>
+                    </p>
                     <p class="seller">
                         賣家：<a href="../profile/publicProfile.php?seller_id=<?php echo htmlspecialchars($product['seller_id']); ?>" style="text-decoration: underline; color: blue;">
                             <?php echo htmlspecialchars($product['seller_name']); ?>
                         </a>
                     </p>
                     <p class="description"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
-                    <form action="../cart/addToCart.php" method="POST">
-                    <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product['id']); ?>">
-                        <div class="quantity">
-                            <label for="quantity">數量：</label>
-                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?php echo htmlspecialchars($product['stock']); ?>">
-                        </div>
-                        <button type="submit">加入購物車</button>
-                    </form>
+                    <?php if ($product['seller_id'] == $userId): ?>
+                        <!-- 如果是自己的商品，顯示編輯按鈕 -->
+                        <form action="../product/edit.php" method="GET">
+                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($product['id']); ?>">
+                            <button type="submit">編輯商品</button>
+                        </form>
+                    <?php elseif ($product['stock'] > 0): ?>
+                        <!-- 如果不是自己的商品且有庫存，顯示購買功能 -->
+                        <form action="../cart/addToCart.php" method="POST">
+                            <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product['id']); ?>">
+                            <div class="quantity">
+                                <label for="quantity">數量：</label>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?php echo htmlspecialchars($product['stock']); ?>">
+                            </div>
+                            <button type="submit">加入購物車</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

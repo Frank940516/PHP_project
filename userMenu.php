@@ -7,7 +7,9 @@ if (isset($_SESSION["user"])) {
             <ul>
                 <li><a href="/profile/profile.php">個人資料</a></li>
                 <li><a href="/cart/cart.php">購物車</a></li>
+                <li><a href="/cart/buyHistory.php">購買紀錄</a></li>
                 <li><a href="/product/showList.php">管理訂單</a></li>
+                <li><a href="/product/sellHistory.php">訂單紀錄</a></li>
                 <li><a href="/login/logout.php">登出</a></li>
             </ul>
         </div>
