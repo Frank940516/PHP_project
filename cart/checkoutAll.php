@@ -28,7 +28,7 @@ $userId = $user['No'];
 
 // 查詢購物車中的所有商品
 $sqlCart = "SELECT c.product_id, p.name AS product_name, p.price, p.attachment, c.quantity, 
-                   (p.price * c.quantity) AS subtotal, p.stock
+                   (p.price * c.quantity) AS subtotal, p.stock, p.category
             FROM cart c
             JOIN products p ON c.product_id = p.id
             WHERE c.user_id = ?";
@@ -101,6 +101,7 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
                     <th>數量</th>
                     <th>小計</th>
                     <th>庫存</th>
+                    <th>種類</th> <!-- 新增種類欄位 -->
                 </tr>
             </thead>
             <tbody>
@@ -114,12 +115,13 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
                         <td><?php echo htmlspecialchars($item['quantity']); ?></td>
                         <td><?php echo htmlspecialchars($item['subtotal']); ?></td>
                         <td><?php echo htmlspecialchars($item['stock']); ?></td>
+                        <td><?php echo htmlspecialchars($item['category']); ?></td> <!-- 顯示書籍種類 -->
                     </tr>
                 <?php endforeach; ?>
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4" style="text-align: right;">總金額：</td>
+                    <td colspan="5" style="text-align: right;">總金額：</td>
                     <td colspan="2"><?php echo htmlspecialchars($total); ?></td>
                 </tr>
             </tfoot>

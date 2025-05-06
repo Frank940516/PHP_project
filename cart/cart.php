@@ -24,13 +24,13 @@ if (!$user) {
 
 $userId = $user['No'];
 
-$sqlCart = "SELECT c.product_id, p.name AS product_name, p.price, p.attachment, SUM(c.quantity) AS total_quantity, 
+$sqlCart = "SELECT c.product_id, p.name AS product_name, p.price, p.attachment, p.category, SUM(c.quantity) AS total_quantity, 
                    (p.price * SUM(c.quantity)) AS subtotal, p.stock, p.seller_id, a.Name AS seller_name
             FROM cart c
             JOIN products p ON c.product_id = p.id
             JOIN accounts a ON p.seller_id = a.No
             WHERE c.user_id = ?
-            GROUP BY c.product_id, p.name, p.price, p.attachment, p.stock, p.seller_id, a.Name";
+            GROUP BY c.product_id, p.name, p.price, p.attachment, p.category, p.stock, p.seller_id, a.Name";
 $stmtCart = mysqli_prepare($link, $sqlCart);
 mysqli_stmt_bind_param($stmtCart, 'i', $userId);
 mysqli_stmt_execute($stmtCart);
@@ -143,6 +143,7 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
         <tr>
             <th>圖片</th>
             <th>商品名稱</th>
+            <th>種類</th> <!-- 新增種類欄位 -->
             <th>賣家</th>
             <th>價格</th>
             <th>數量</th>
@@ -163,6 +164,7 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
                     </a>
                     (庫存：<?php echo htmlspecialchars($item['stock']); ?>)
                 </td>
+                <td><?php echo htmlspecialchars($item['category']); ?></td> <!-- 顯示商品種類 -->
                 <td>
                     <a href="../profile/publicProfile.php?seller_id=<?php echo htmlspecialchars($item['seller_id']); ?>" style="text-decoration: none; color: blue;">
                         <?php echo htmlspecialchars($item['seller_name']); ?>
@@ -203,13 +205,13 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
             </tr>
         <?php endforeach; ?>
     <?php else: ?>
-        <tr><td colspan="7">購物車是空的</td></tr>
+        <tr><td colspan="8">購物車是空的</td></tr>
     <?php endif; ?>
     </tbody>
     <tfoot>
         <tr>
             <td colspan="5" class="total">總金額：</td>
-            <td colspan="2" class="total-cell">
+            <td colspan="3" class="total-cell">
                 <?php echo $total; ?>
                 <form action="checkoutAll.php" method="POST" style="display: inline;">
                     <button type="submit" class="checkout-btn">全部結帳</button>

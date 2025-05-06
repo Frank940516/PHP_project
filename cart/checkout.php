@@ -36,7 +36,7 @@ if (!isset($_POST['product_id'])) {
 $productId = intval($_POST['product_id']);
 
 // 查詢商品細節
-$sqlProduct = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, c.quantity, 
+$sqlProduct = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, p.category, c.quantity, 
                       a.Name AS seller_name  -- 新增賣家名稱
                FROM products p
                JOIN cart c ON p.id = c.product_id
@@ -108,7 +108,8 @@ if (!$product) {
             <th>小計</th>
             <th>庫存</th>
             <th>描述</th>
-            <th>賣家</th> <!-- 新增賣家欄位 -->
+            <th>種類</th> <!-- 新增種類欄位 -->
+            <th>賣家</th>
         </tr>
         <tr>
             <td>
@@ -120,7 +121,8 @@ if (!$product) {
             <td><?php echo htmlspecialchars($product['price'] * $product['quantity']); ?></td>
             <td><?php echo htmlspecialchars($product['stock']); ?></td>
             <td><?php echo htmlspecialchars($product['description']); ?></td>
-            <td><?php echo htmlspecialchars($product['seller_name']); ?></td> <!-- 顯示賣家名稱 -->
+            <td><?php echo htmlspecialchars($product['category']); ?></td> <!-- 顯示書籍種類 -->
+            <td><?php echo htmlspecialchars($product['seller_name']); ?></td>
         </tr>
     </table>
 

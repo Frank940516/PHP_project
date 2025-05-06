@@ -63,7 +63,33 @@ session_start();
             cursor: pointer;
             margin-right: 10px; /* 與標題之間的間距 */
             }
-    
+            .search-container {
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            .search-input {
+                padding: 8px;
+                font-size: 14px;
+                width: 300px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-right: 10px;
+            }
+            .search-button {
+                padding: 8px 15px;
+                font-size: 14px;
+                color: #fff;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+            .search-button:hover {
+                background-color: #45a049;
+            }
         </style>
     </head>
     <body>
@@ -85,6 +111,14 @@ session_start();
                 echo "</div>";
             }
             ?>
+        </div>
+
+        <!-- search bar -->
+        <div class="search-container">
+            <form action="search.php" method="GET">
+                <input type="text" name="query" placeholder="搜尋公告..." class="search-input">
+                <button type="submit" class="search-button">搜尋</button>
+            </form>
         </div>
 
         <!-- announcement area -->

@@ -3,8 +3,27 @@
     mysqli_set_charset($link, 'utf8');
     session_start();
 
-    // 查詢所有有庫存的商品
-    $sql = "SELECT id, name, price, attachment FROM products WHERE stock > 0";
+    $categoryFilter = isset($_GET['category']) ? $_GET['category'] : '';
+    $searchKeyword = isset($_GET['search']) ? $_GET['search'] : '';
+    $selectedCategory = isset($_GET['category']) ? $_GET['category'] : '';
+
+    // 定義類別陣列
+    $categories = [
+        "文學/小說", "心理勵志", "商業/理財", "藝術/設計", "人文/歷史/地理",
+        "科學/科普/自然", "電腦/資訊", "語言學習", "考試用書/教科書",
+        "童書/繪本", "漫畫/輕小說", "旅遊/地圖", "醫療/保健", "生活風格/休閒", "其他"
+    ];
+
+    $sql = "SELECT id, name, price, attachment, category FROM products WHERE stock > 0";
+
+    if (!empty($categoryFilter)) {
+        $sql .= " AND category = '" . mysqli_real_escape_string($link, $categoryFilter) . "'";
+    }
+
+    if (!empty($searchKeyword)) {
+        $sql .= " AND name LIKE '%" . mysqli_real_escape_string($link, $searchKeyword) . "%'";
+    }
+
     $result = mysqli_query($link, $sql);
     $products = [];
     while ($row = mysqli_fetch_assoc($result)) {
@@ -99,6 +118,40 @@
             </div>
         </div>
         <h1 style="text-align: center;">二手書交易平台</h1>
+        <div style="text-align: center; margin: 20px 0;">
+            <!-- 搜尋欄 -->
+            <form method="GET" action="index.php" style="margin-bottom: 20px;">
+                <input type="text" name="search" placeholder="搜尋書籍" value="<?php echo htmlspecialchars($searchKeyword); ?>" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+                <button type="submit" style="padding: 8px 15px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">搜尋</button>
+            </form>
+
+            <?php if (empty($searchKeyword)): // 當搜尋欄為空時顯示類別按鈕 ?>
+                <!-- 類別按鈕 -->
+                <div>
+                    <!-- 第一行按鈕 -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <?php $firstRow = array_slice($categories, 0, 7); // 取前 7 個 ?>
+                        <?php foreach ($firstRow as $category): ?>
+                            <a href="index.php?category=<?php echo $selectedCategory === $category ? '' : urlencode($category); ?>" 
+                               style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo $selectedCategory === $category ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo $selectedCategory === $category ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                                <?php echo htmlspecialchars($category); ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- 第二行按鈕 -->
+                    <div style="display: flex; justify-content: space-between;">
+                        <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
+                        <?php foreach ($secondRow as $category): ?>
+                            <a href="index.php?category=<?php echo $selectedCategory === $category ? '' : urlencode($category); ?>" 
+                               style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo $selectedCategory === $category ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo $selectedCategory === $category ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                                <?php echo htmlspecialchars($category); ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
         <div class="product-grid">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
@@ -113,7 +166,7 @@
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p style="text-align: center;">目前沒有商品。</p>
+                <p style="text-align: center;">目前沒有符合條件的商品。</p>
             <?php endif; ?>
         </div>
     </body>

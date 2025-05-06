@@ -1,5 +1,4 @@
 <?php
-// filepath: c:\xampp\htdocs\cart\buyHistory.php
 require('../db.inc');
 mysqli_set_charset($link, 'utf8');
 session_start();
@@ -30,14 +29,14 @@ $userId = $user['No'];
 // 查詢購買紀錄
 $sqlHistory = "SELECT o.id AS order_id, o.total_amount, o.created_at, 
                       oi.product_id, p.name AS product_name, p.attachment, p.is_deleted, 
-                      oi.quantity, oi.price, oi.subtotal, 
-                      a.No AS seller_id, a.Name AS seller_name  -- 新增 seller_id
+                      oi.quantity, oi.price, oi.subtotal, p.category, -- 新增 category 欄位
+                      a.No AS seller_id, a.Name AS seller_name
                FROM orders o
                JOIN order_items oi ON o.id = oi.order_id
                JOIN products p ON oi.product_id = p.id
-               JOIN accounts a ON p.seller_id = a.No  -- 連接賣家帳戶
+               JOIN accounts a ON p.seller_id = a.No
                WHERE o.user_id = ?
-               ORDER BY p.name ASC, o.created_at DESC";
+               ORDER BY o.created_at DESC, p.name ASC";
 $stmtHistory = mysqli_prepare($link, $sqlHistory);
 mysqli_stmt_bind_param($stmtHistory, 'i', $userId);
 mysqli_stmt_execute($stmtHistory);
@@ -135,21 +134,14 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                 <?php $productTotal = 0; // 重置總金額 ?>
                 <?php endif; ?>
                 <div class="product-header">
-                    <span>商品名稱：
-                        <?php if ($record['is_deleted']): ?>
-                            <span class="deleted-product">商品已被賣家移除</span>
-                        <?php else: ?>
-                            <a href="../product/detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link">
-                                <?php echo htmlspecialchars($record['product_name']); ?>
-                            </a>
-                        <?php endif; ?>
-                    </span>
+                    <div>商品名稱：<a href="../product/detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></div>
+                    <div>種類：<?php echo htmlspecialchars($record['category']); ?></div>
                 </div>
                 <table>
                     <thead>
                         <tr>
                             <th>圖片</th>
-                            <th>賣家</th> <!-- 新增賣家欄位 -->
+                            <th>賣家</th>
                             <th>購買時間</th>
                             <th>數量</th>
                             <th>單價</th>
@@ -175,9 +167,8 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                         </tr>
                         <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
             <?php if (end($buyRecords) === $record || $currentProductId !== $buyRecords[array_search($record, $buyRecords) + 1]['product_id']): ?>
-                    <!-- 顯示最後一個商品的總金額 -->
                     <tr class="total-row">
-                        <td colspan="6">總金額：</td>
+                        <td colspan="5">總金額：</td>
                         <td><?php echo htmlspecialchars($productTotal); ?></td>
                     </tr>
                     </tbody>

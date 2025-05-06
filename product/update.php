@@ -33,11 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stock = $_POST['stock'];
     $condition = $_POST['condition'];
     $description = $_POST['description'];
+    $category = $_POST['category']; // 新增接收種類欄位
 
     // 更新商品資料
-    $sqlUpdate = "UPDATE products SET name = ?, price = ?, stock = ?, `condition` = ?, description = ? WHERE id = ? AND seller_id = ?";
+    $sqlUpdate = "UPDATE products SET name = ?, price = ?, stock = ?, `condition` = ?, description = ?, category = ? WHERE id = ? AND seller_id = ?";
     $stmtUpdate = mysqli_prepare($link, $sqlUpdate);
-    mysqli_stmt_bind_param($stmtUpdate, 'sdissii', $name, $price, $stock, $condition, $description, $productId, $userId);
+    mysqli_stmt_bind_param($stmtUpdate, 'sdisssii', $name, $price, $stock, $condition, $description, $category, $productId, $userId);
     mysqli_stmt_execute($stmtUpdate);
 
     // 處理圖片更新

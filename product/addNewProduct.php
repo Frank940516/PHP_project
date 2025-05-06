@@ -86,6 +86,25 @@ if (!isset($_SESSION['user'])) {
             <option value="五成新">五成新</option>
         </select>
 
+        <label for="category">書籍種類</label>
+        <select id="category" name="category" required>
+            <option value="文學/小說">文學/小說</option>
+            <option value="心理勵志">心理勵志</option>
+            <option value="商業/理財">商業/理財</option>
+            <option value="藝術/設計">藝術/設計</option>
+            <option value="人文/歷史/地理">人文/歷史/地理</option>
+            <option value="科學/科普/自然">科學/科普/自然</option>
+            <option value="電腦/資訊">電腦/資訊</option>
+            <option value="語言學習">語言學習</option>
+            <option value="考試用書/教科書">考試用書/教科書</option>
+            <option value="童書/繪本">童書/繪本</option>
+            <option value="漫畫/輕小說">漫畫/輕小說</option>
+            <option value="旅遊/地圖">旅遊/地圖</option>
+            <option value="醫療/保健">醫療/保健</option>
+            <option value="生活風格/休閒">生活風格/休閒</option>
+            <option value="其他">其他</option>
+        </select>
+
         <label for="description">商品描述</label>
         <textarea id="description" name="description" rows="5" required></textarea>
 

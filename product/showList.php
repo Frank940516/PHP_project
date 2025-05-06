@@ -27,9 +27,9 @@ if (!$user) {
 $userId = $user['No'];
 
 // 查詢使用者上架的商品
-$sqlProducts = "SELECT id, name, price, stock, `condition`, description, attachment 
+$sqlProducts = "SELECT id, name, price, stock, `condition`, description, attachment, category 
                 FROM products 
-                WHERE seller_id = ? AND is_deleted = 0"; // 新增條件 is_deleted = 0
+                WHERE seller_id = ? AND is_deleted = 0"; // 新增 category 欄位
 $stmtProducts = mysqli_prepare($link, $sqlProducts);
 mysqli_stmt_bind_param($stmtProducts, 'i', $userId);
 mysqli_stmt_execute($stmtProducts);
@@ -136,6 +136,7 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
                 <th>庫存</th>
                 <th>狀況</th>
                 <th>描述</th>
+                <th>種類</th> <!-- 新增種類欄位 -->
                 <th>操作</th>
             </tr>
         </thead>
@@ -155,6 +156,7 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
                         <td><?php echo htmlspecialchars($product['condition']); ?></td>
                         <td><?php echo nl2br(htmlspecialchars($product['description'])); ?></td>
+                        <td><?php echo htmlspecialchars($product['category']); ?></td> <!-- 顯示書籍種類 -->
                         <td class="action-buttons">
                             <a href="edit.php?id=<?php echo $product['id']; ?>">編輯</a>
                             <a href="delete.php?id=<?php echo $product['id']; ?>" class="delete-button" onclick="return confirm('確定要刪除此商品嗎？');">刪除</a>
@@ -163,7 +165,7 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="7">目前沒有上架的商品。</td>
+                    <td colspan="8">目前沒有上架的商品。</td>
                 </tr>
             <?php endif; ?>
         </tbody>

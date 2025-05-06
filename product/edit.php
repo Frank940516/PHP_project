@@ -35,7 +35,7 @@ if (!isset($_GET['id'])) {
 $productId = $_GET['id'];
 
 // 查詢商品資料
-$sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment FROM products WHERE id = ? AND seller_id = ?";
+$sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category FROM products WHERE id = ? AND seller_id = ?";
 $stmtProduct = mysqli_prepare($link, $sqlProduct);
 mysqli_stmt_bind_param($stmtProduct, 'ii', $productId, $userId);
 mysqli_stmt_execute($stmtProduct);
@@ -129,6 +129,25 @@ if (!$product) {
             <option value="九成新" <?php echo $product['condition'] === '九成新' ? 'selected' : ''; ?>>九成新</option>
             <option value="七成新" <?php echo $product['condition'] === '七成新' ? 'selected' : ''; ?>>七成新</option>
             <option value="五成新" <?php echo $product['condition'] === '五成新' ? 'selected' : ''; ?>>五成新</option>
+        </select>
+
+        <label for="category">書籍種類</label>
+        <select id="category" name="category" required>
+            <option value="文學/小說" <?php echo $product['category'] === '文學/小說' ? 'selected' : ''; ?>>文學/小說</option>
+            <option value="心理勵志" <?php echo $product['category'] === '心理勵志' ? 'selected' : ''; ?>>心理勵志</option>
+            <option value="商業/理財" <?php echo $product['category'] === '商業/理財' ? 'selected' : ''; ?>>商業/理財</option>
+            <option value="藝術/設計" <?php echo $product['category'] === '藝術/設計' ? 'selected' : ''; ?>>藝術/設計</option>
+            <option value="人文/歷史/地理" <?php echo $product['category'] === '人文/歷史/地理' ? 'selected' : ''; ?>>人文/歷史/地理</option>
+            <option value="科學/科普/自然" <?php echo $product['category'] === '科學/科普/自然' ? 'selected' : ''; ?>>科學/科普/自然</option>
+            <option value="電腦/資訊" <?php echo $product['category'] === '電腦/資訊' ? 'selected' : ''; ?>>電腦/資訊</option>
+            <option value="語言學習" <?php echo $product['category'] === '語言學習' ? 'selected' : ''; ?>>語言學習</option>
+            <option value="考試用書/教科書" <?php echo $product['category'] === '考試用書/教科書' ? 'selected' : ''; ?>>考試用書/教科書</option>
+            <option value="童書/繪本" <?php echo $product['category'] === '童書/繪本' ? 'selected' : ''; ?>>童書/繪本</option>
+            <option value="漫畫/輕小說" <?php echo $product['category'] === '漫畫/輕小說' ? 'selected' : ''; ?>>漫畫/輕小說</option>
+            <option value="旅遊/地圖" <?php echo $product['category'] === '旅遊/地圖' ? 'selected' : ''; ?>>旅遊/地圖</option>
+            <option value="醫療/保健" <?php echo $product['category'] === '醫療/保健' ? 'selected' : ''; ?>>醫療/保健</option>
+            <option value="生活風格/休閒" <?php echo $product['category'] === '生活風格/休閒' ? 'selected' : ''; ?>>生活風格/休閒</option>
+            <option value="其他" <?php echo $product['category'] === '其他' ? 'selected' : ''; ?>>其他</option>
         </select>
 
         <label for="description">商品描述</label>

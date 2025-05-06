@@ -33,13 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stock = $_POST['stock'];
     $condition = $_POST['condition'];
     $description = $_POST['description'];
+    $category = $_POST['category']; // 新增書籍種類
     $attachment = '';
 
     // 插入商品資料（先插入，取得商品 ID）
-    $sqlInsert = "INSERT INTO products (name, price, stock, `condition`, description, seller_id) 
-                  VALUES (?, ?, ?, ?, ?, ?)";
+    $sqlInsert = "INSERT INTO products (name, price, stock, `condition`, description, category, seller_id) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmtInsert = mysqli_prepare($link, $sqlInsert);
-    mysqli_stmt_bind_param($stmtInsert, 'sdissi', $name, $price, $stock, $condition, $description, $userId);
+    mysqli_stmt_bind_param($stmtInsert, 'sdisssi', $name, $price, $stock, $condition, $description, $category, $userId);
     mysqli_stmt_execute($stmtInsert);
 
     if (mysqli_stmt_affected_rows($stmtInsert) > 0) {

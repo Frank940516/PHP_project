@@ -26,8 +26,8 @@ if (!$user) {
 
 $userId = $user['No'];
 
-// 查詢販售商品的購買紀錄
-$sqlSellHistory = "SELECT oi.product_id, p.name AS product_name, p.attachment, 
+// 查詢販售商品的購買紀錄，按購買時間降序排列
+$sqlSellHistory = "SELECT oi.product_id, p.name AS product_name, p.attachment, p.category, 
                           o.created_at, o.total_amount, oi.quantity, oi.price, oi.subtotal, 
                           a.No AS buyer_id, a.Name AS buyer_name
                    FROM orders o
@@ -35,7 +35,7 @@ $sqlSellHistory = "SELECT oi.product_id, p.name AS product_name, p.attachment,
                    JOIN products p ON oi.product_id = p.id
                    JOIN accounts a ON o.user_id = a.No
                    WHERE p.seller_id = ?
-                   ORDER BY p.name ASC, o.created_at DESC";
+                   ORDER BY o.created_at DESC"; // 按購買時間降序排列
 $stmtSellHistory = mysqli_prepare($link, $sqlSellHistory);
 mysqli_stmt_bind_param($stmtSellHistory, 'i', $userId);
 mysqli_stmt_execute($stmtSellHistory);
@@ -125,17 +125,13 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
         ?>
             <?php if ($currentProductId !== $record['product_id']): ?>
                 <?php if ($currentProductId !== null): ?>
-                    <!-- 顯示上一個商品的總金額 -->
-                    <tr class="total-row">
-                        <td colspan="5">總金額：</td>
-                        <td><?php echo htmlspecialchars($productTotal); ?></td>
-                    </tr>
                     </tbody>
                 </table>
                 <?php $productTotal = 0; // 重置總金額 ?>
                 <?php endif; ?>
                 <div class="product-header">
-                    <span>商品名稱：<a href="detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></span>
+                    <div>商品名稱：<a href="detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></div>
+                    <div>種類：<?php echo htmlspecialchars($record['category']); ?></div>
                 </div>
                 <table>
                     <thead>
