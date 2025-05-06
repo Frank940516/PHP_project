@@ -118,10 +118,10 @@ if (!$product) {
         <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
 
         <label for="price">價格</label>
-        <input type="number" id="price" name="price" step="0.01" value="<?php echo htmlspecialchars($product['price']); ?>" required>
+        <input type="number" id="price" name="price" step="1" min="1" value="<?php echo htmlspecialchars($product['price']); ?>" required oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/^0+/, '');">
 
         <label for="stock">庫存</label>
-        <input type="number" id="stock" name="stock" value="<?php echo htmlspecialchars($product['stock']); ?>" required>
+        <input type="number" id="stock" name="stock" step="1" min="1" value="<?php echo htmlspecialchars($product['stock']); ?>" required oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/^0+/, '');">
 
         <label for="condition">商品狀況</label>
         <select id="condition" name="condition" required>
