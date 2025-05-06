@@ -109,7 +109,7 @@ if (!$announcement) {
                 <input type="hidden" name="No" value="<?php echo htmlspecialchars($announcementNo); ?>">
 
                 <label for="title">公告標題</label>
-                <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($announcement['Title']); ?>" required>
+                <input type="text" id="title" name="title" maxlength="50" placeholder="請輸入公告標題（最多 50 字）" value="<?php echo htmlspecialchars($announcement['Title']); ?>" required>
 
                 <label for="content">公告內容</label>
                 <div class="markdown-tools">

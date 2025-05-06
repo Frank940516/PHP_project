@@ -90,7 +90,7 @@ if (!isset($_SESSION['user'])) {
         <textarea id="description" name="description" rows="5" required></textarea>
 
         <label for="attachment">商品圖片</label>
-        <input type="file" id="attachment" name="attachment" accept="image/*">
+        <input type="file" id="attachment" name="attachment" accept="image/*"  required>
 
         <button type="submit">新增商品</button>
     </form>

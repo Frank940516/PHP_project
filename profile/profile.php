@@ -91,7 +91,7 @@ if (!$user) {
             <form action="updateProfile.php" method="POST">
                 <div class="form-group">
                     <label for="name">使用者名稱</label>
-                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['Name']); ?>" required>
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['Name']); ?>" maxlength="20" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>

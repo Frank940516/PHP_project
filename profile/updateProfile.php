@@ -10,7 +10,11 @@ if (!isset($_SESSION["user"])) {
 }
 
 // 獲取表單資料
-$name = isset($_POST['name']) ? trim($_POST['name']) : '';
+$name = trim($_POST['name']);
+if (mb_strlen($name, 'UTF-8') > 20) {
+    echo "使用者名稱長度不能超過 20 字！";
+    exit();
+}
 $email = $_SESSION["user"]; // Email 不允許修改
 
 // 驗證資料

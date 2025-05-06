@@ -66,7 +66,9 @@
                 color: #333;
             }
             .content {
-                white-space: normal;
+                white-space: normal; /* 確保文字正常換行 */
+                word-wrap: break-word; /* 長單字換行 */
+                word-break: break-word; /* 支援長單字換行（兼容性更好） */
                 background: #f9f9f9;
                 padding: 15px;
                 border-left: 4px solid #4CAF50;

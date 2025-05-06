@@ -181,6 +181,7 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
                             value="<?php echo $item['total_quantity']; ?>" 
                             min="1" 
                             max="<?php echo $item['stock']; ?>" 
+                            step="1" 
                             <?php echo $item['stock'] == 0 ? 'disabled' : ''; ?>
                         >
                     <?php endif; ?>
@@ -219,6 +220,28 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
 </table>
 
 <script>
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('input', function () {
+            // 移除非數字或小數點的輸入
+            this.value = this.value.replace(/[^0-9]/g, '');
+
+            // 確保數量至少為 1
+            if (this.value === '' || parseInt(this.value, 10) < 1) {
+                this.value = 1;
+            }
+        });
+
+        input.addEventListener('change', function () {
+            const max = parseInt(this.max, 10);
+
+            // 檢查數量是否超過庫存
+            if (parseInt(this.value, 10) > max) {
+                alert('數量不能超過庫存！');
+                this.value = max;
+            }
+        });
+    });
+
     document.querySelectorAll('.quantity-input').forEach(input => {
         input.addEventListener('change', async function () {
             const productId = this.dataset.productId;

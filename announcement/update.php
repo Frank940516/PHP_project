@@ -16,6 +16,13 @@ $title = isset($_POST['title']) ? trim($_POST['title']) : '';
 $content = isset($_POST['content']) ? trim($_POST['content']) : '';
 $date = date('Y-m-d H:i:s'); // 更新公告時間
 
+// 驗證標題長度
+$title = trim($_POST['title']);
+if (mb_strlen($title, 'UTF-8') > 50) {
+    echo "標題長度不能超過 50 字！";
+    exit();
+}
+
 // 確保 Publisher 是有效的 accounts.No
 $userEmail = $_SESSION['user'];
 $sqlGetPublisher = "SELECT No FROM accounts WHERE Email = ?";
