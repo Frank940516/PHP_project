@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-05-07 10:55:26
+-- 產生時間： 2025-05-07 14:00:52
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -184,12 +184,14 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `category`, `seller_id`, `condition`, `description`, `attachment`, `price`, `stock`, `created_at`, `updated_at`, `is_deleted`) VALUES
-(9, 'test23', '科學/科普/自然', 1, '七成新', '121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn', '-9.png', 12, 2222, '2025-05-04 22:42:35', '2025-05-06 23:46:15', 0),
-(11, 'PHP教科書2', '電腦/資訊', 6, '九成新', '去年買的，有一點小筆跡', '-11.png', 300, 2, '2025-05-04 23:41:25', '2025-05-06 20:53:48', 0),
+(9, 'test23', '科學/科普/自然', 1, '七成新', '121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn\r\n121212dsfhuod;nfod;f dihf[pdfhno;eifhbwnriiiiiiiiiiiiiiiiiiiiiiiiiweofbdsfoi;vn', '-9.png', 12, 2222, '2025-05-04 22:42:35', '2025-05-07 19:47:35', 1),
+(11, 'PHP教科書2', '電腦/資訊', 6, '七成新', '去年買的，有一點小筆跡', '-11.png', 300, 2, '2025-05-04 23:41:25', '2025-05-07 19:34:28', 0),
 (13, 'more books', '', 1, '九成新', '前年買的，沒什麼畫過\r\n需要者收，可議價', 'Ayaya-13.png', 150, 3, '2025-05-05 10:39:04', '2025-05-05 21:04:45', 1),
 (15, '1212', '', 4, '五成新', 'idk', 'TEST-15.png', 121, 4, '2025-05-05 21:10:53', '2025-05-05 21:29:03', 0),
-(16, 'Java 指南', '電腦/資訊', 1, '全新', '要買要快 難得的好書！', 'Ayaya .w.Ayaya .w.-16.png', 500, 10, '2025-05-06 20:05:29', '2025-05-06 20:39:33', 0),
-(17, 'Java Advanced Textbook', '考試用書/教科書', 1, '九成新', '去年買的', 'Ayaya .w.Ayaya .w.-17.png', 800, 12, '2025-05-06 22:07:52', '2025-05-06 22:07:52', 0);
+(16, 'Java 指南', '電腦/資訊', 1, '全新', '要買要快 難得的好書！', '螢幕擷取畫面 2025-05-02 223442.png', 500, 10, '2025-05-06 20:05:29', '2025-05-07 19:40:54', 0),
+(17, 'Java Advanced Textbook', '考試用書/教科書', 1, '九成新', '去年買的', 'Ayaya .w.Ayaya .w.-17.png', 800, 12, '2025-05-06 22:07:52', '2025-05-06 22:07:52', 0),
+(20, '資料庫理論與實務', '考試用書/教科書', 4, '七成新', '教科書', 'TEST123-20.png', 700, 10, '2025-05-07 19:49:47', '2025-05-07 19:59:20', 0),
+(21, 'ChatGPT實務', '電腦/資訊', 4, '五成新', '有點舊，但是它是個很棒的書', 'TEST123-21.png', 1000, 5, '2025-05-07 19:51:54', '2025-05-07 19:57:10', 1);
 
 --
 -- 已傾印資料表的索引
@@ -276,7 +278,7 @@ ALTER TABLE `order_items`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- 已傾印資料表的限制式

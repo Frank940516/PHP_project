@@ -13,7 +13,8 @@
 
         if (isset($_GET['error'])) {
             if ($_GET['error'] === 'blocked') {
-                echo "<p style='color: red;'>登入失敗，已被管理員封鎖。</p>";
+                $reason = isset($_GET['reason']) ? htmlspecialchars(urldecode($_GET['reason'])) : '無具體原因';
+                echo "<p style='color: red;'>登入失敗，已被管理員封鎖。原因：$reason</p>";
             } elseif ($_GET['error'] === 'password') {
                 echo "<p style='color: red;'>密碼錯誤，請再試一次。</p>";
             } elseif ($_GET['error'] === 'email') {
