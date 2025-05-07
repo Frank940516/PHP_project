@@ -3,24 +3,20 @@
     mysqli_set_charset($link, 'utf8');
     session_start();
 
-    // 定義類別陣列
-    $categories = [
-        "文學/小說", "心理勵志", "商業/理財", "藝術/設計", "人文/歷史/地理",
-        "科學/科普/自然", "電腦/資訊", "語言學習", "考試用書/教科書",
-        "童書/繪本", "漫畫/輕小說", "旅遊/地圖", "醫療/保健", "生活風格/休閒", "其他"
-    ];
-
-    // 取得篩選條件
     $categoryFilter = isset($_GET['category']) ? $_GET['category'] : '';
-    $sortOrder = isset($_GET['sort']) ? $_GET['sort'] : '';
+    $searchKeyword = isset($_GET['search']) ? $_GET['search'] : '';
+    $sortOrder = isset($_GET['sort']) ? $_GET['sort'] : 'date';
     $minPrice = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
     $maxPrice = isset($_GET['max_price']) ? (float)$_GET['max_price'] : 0;
 
-    // 查詢所有正在販售的商品，並根據篩選條件篩選
-    $sql = "SELECT id, name, price, attachment, category, created_at FROM products WHERE stock > 0";
+    $sql = "SELECT id, name, price, attachment, category FROM products WHERE stock > 0";
 
     if (!empty($categoryFilter)) {
         $sql .= " AND category = '" . mysqli_real_escape_string($link, $categoryFilter) . "'";
+    }
+
+    if (!empty($searchKeyword)) {
+        $sql .= " AND name LIKE '%" . mysqli_real_escape_string($link, $searchKeyword) . "%'";
     }
 
     if ($minPrice > 0) {
@@ -48,7 +44,7 @@
 <html>
     <meta charset="UTF-8">
     <head>
-        <title>二手書交易平台-首頁</title>
+        <title>搜尋結果</title>
         <style>
             .top-bar {
                 display: flex;
@@ -58,7 +54,7 @@
                 background-color: #f8f9fa;
                 border-bottom: 1px solid #ddd;
             }
-            .announcement-button {
+            .home-button {
                 background-color: #007BFF;
                 color: white;
                 padding: 10px 15px;
@@ -68,12 +64,33 @@
                 cursor: pointer;
                 text-decoration: none;
             }
-            .announcement-button:hover {
+            .home-button:hover {
                 background-color: #0056b3;
             }
             .top-right-buttons {
                 display: flex;
                 gap: 10px;
+            }
+            .search-bar {
+                text-align: center;
+                margin: 20px 0;
+            }
+            .search-bar input[type="text"] {
+                padding: 8px;
+                width: 300px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            .search-bar button {
+                padding: 8px 15px;
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .search-bar button:hover {
+                background-color: #0056b3;
             }
             .filter-dropdown {
                 position: relative;
@@ -166,63 +183,39 @@
                 font-weight: bold;
                 margin: 10px 0;
             }
-            .product-item a {
-                display: inline-block;
-                margin: 10px 0;
-                padding: 8px 15px;
-                background-color: #4CAF50;
-                color: white;
-                text-decoration: none;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            .product-item a:hover {
-                background-color: #45a049;
-            }
         </style>
     </head>
     <body>
+        <!-- 頂部導航欄 -->
         <div class="top-bar">
-            <a href="announcement/announcement.php" class="announcement-button">公告</a>
+            <a href="index.php" class="home-button">回首頁</a>
             <div class="top-right-buttons">
                 <?php include('userMenu.php'); ?>
             </div>
         </div>
-
-        <h1 style="text-align: center;">二手書交易平台</h1>
 
         <!-- 搜尋與篩選 -->
         <div style="text-align: center; margin: 20px 0;">
             <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
                 <!-- 搜尋欄 -->
                 <form method="GET" action="search.php" style="display: flex; align-items: center;">
-                    <input type="text" id="searchInput" name="search" placeholder="搜尋書籍" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;" oninput="toggleSearchButton()">
-                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sortOrder); ?>">
-                    <input type="hidden" name="min_price" value="<?php echo htmlspecialchars($minPrice); ?>">
-                    <input type="hidden" name="max_price" value="<?php echo htmlspecialchars($maxPrice); ?>">
-                    <button type="submit" id="searchButton" style="padding: 8px 15px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;" disabled>搜尋</button>
+                    <input type="text" id="searchInput" name="search" placeholder="搜尋書籍" value="<?php echo htmlspecialchars($searchKeyword); ?>" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+                    <button type="submit" id="searchButton" style="padding: 8px 15px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">搜尋</button>
                 </form>
-
-                <script>
-                    function toggleSearchButton() {
-                        const searchInput = document.getElementById('searchInput');
-                        const searchButton = document.getElementById('searchButton');
-                        searchButton.disabled = searchInput.value.trim() === '';
-                    }
-                </script>
 
                 <!-- 篩選條件 -->
                 <div class="filter-dropdown">
                     <button class="filter-button">篩選條件 ▼</button>
                     <div class="filter-content">
-                        <form method="GET" action="index.php">
+                        <form method="GET" action="search.php">
+                            <input type="hidden" name="search" value="<?php echo htmlspecialchars($searchKeyword); ?>">
                             <!-- 排序 -->
                             <div style="margin-bottom: 10px;">
                                 <label style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">排序</label>
                                 <div style="display: flex; flex-direction: column; gap: 5px;">
                                     <label style="display: flex; align-items: center; justify-content: space-between;">
                                         按日期排序
-                                        <input type="radio" name="sort" value="date" <?php echo empty($sortOrder) || $sortOrder === 'date' ? 'checked' : ''; ?>>
+                                        <input type="radio" name="sort" value="date" <?php echo $sortOrder === 'date' ? 'checked' : ''; ?>>
                                     </label>
                                     <label style="display: flex; align-items: center; justify-content: space-between;">
                                         價格低到高
@@ -253,7 +246,7 @@
                             <!-- 按鈕 -->
                             <div style="display: flex; gap: 10px;">
                                 <button type="submit" style="flex: 1; background-color: #007BFF; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">套用篩選</button>
-                                <button type="button" onclick="window.location.href='index.php?sort=date';" style="flex: 1; background-color: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">重設篩選</button>
+                                <button type="button" onclick="window.location.href='search.php?search=<?php echo urlencode($searchKeyword); ?>&sort=date';" style="flex: 1; background-color: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">重設篩選</button>
                             </div>
                         </form>
                     </div>
@@ -261,32 +254,7 @@
             </div>
         </div>
 
-        <!-- 類別按鈕 -->
-        <div>
-            <!-- 第一行按鈕 -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <?php $firstRow = array_slice($categories, 0, 7); // 取前 7 個 ?>
-                <?php foreach ($firstRow as $category): ?>
-                    <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
-                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
-                        <?php echo htmlspecialchars($category); ?>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- 第二行按鈕 -->
-            <div style="display: flex; justify-content: space-between;">
-                <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
-                <?php foreach ($secondRow as $category): ?>
-                    <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
-                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
-                        <?php echo htmlspecialchars($category); ?>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <!-- 商品列表 -->
+        <!-- 搜尋結果 -->
         <div class="product-grid">
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
@@ -301,7 +269,7 @@
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p style="text-align: center;">目前沒有商品。</p>
+                <p style="text-align: center;">沒有符合條件的商品。</p>
             <?php endif; ?>
         </div>
     </body>

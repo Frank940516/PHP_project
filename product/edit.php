@@ -11,8 +11,8 @@ if (!isset($_SESSION['user'])) {
 
 $userEmail = $_SESSION['user'];
 
-// 查詢使用者 ID
-$sqlUser = "SELECT No FROM accounts WHERE Email = ?";
+// 查詢使用者資訊
+$sqlUser = "SELECT No, Type FROM accounts WHERE Email = ?";
 $stmtUser = mysqli_prepare($link, $sqlUser);
 mysqli_stmt_bind_param($stmtUser, 's', $userEmail);
 mysqli_stmt_execute($stmtUser);
@@ -25,6 +25,7 @@ if (!$user) {
 }
 
 $userId = $user['No'];
+$userType = $user['Type']; // 確認使用者類型（User 或 Admin）
 
 // 確認商品 ID
 if (!isset($_GET['id'])) {
@@ -35,15 +36,71 @@ if (!isset($_GET['id'])) {
 $productId = $_GET['id'];
 
 // 查詢商品資料
-$sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category FROM products WHERE id = ? AND seller_id = ?";
-$stmtProduct = mysqli_prepare($link, $sqlProduct);
-mysqli_stmt_bind_param($stmtProduct, 'ii', $productId, $userId);
+if ($userType === 'Admin') {
+    // 管理員可以編輯所有商品
+    $sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category FROM products WHERE id = ?";
+    $stmtProduct = mysqli_prepare($link, $sqlProduct);
+    mysqli_stmt_bind_param($stmtProduct, 'i', $productId);
+} else {
+    // 一般使用者只能編輯自己的商品
+    $sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category FROM products WHERE id = ? AND seller_id = ?";
+    $stmtProduct = mysqli_prepare($link, $sqlProduct);
+    mysqli_stmt_bind_param($stmtProduct, 'ii', $productId, $userId);
+}
+
 mysqli_stmt_execute($stmtProduct);
 $resultProduct = mysqli_stmt_get_result($stmtProduct);
 $product = mysqli_fetch_assoc($resultProduct);
 
 if (!$product) {
     echo "商品不存在或無權限編輯！";
+    exit();
+}
+
+// 如果是 POST 請求，處理表單提交
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'];
+    $price = $_POST['price'];
+    $stock = $_POST['stock'];
+    $condition = $_POST['condition'];
+    $category = $_POST['category'];
+    $description = $_POST['description'];
+
+    // 處理圖片上傳
+    $attachment = $product['attachment']; // 預設為原本的圖片
+    if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = '../product/pic/';
+        $fileName = basename($_FILES['attachment']['name']);
+        $targetFilePath = $uploadDir . $fileName;
+
+        // 確保目錄存在
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // 移動上傳的檔案
+        if (move_uploaded_file($_FILES['attachment']['tmp_name'], $targetFilePath)) {
+            $attachment = $fileName; // 更新圖片名稱
+        } else {
+            echo "圖片上傳失敗！";
+            exit();
+        }
+    }
+
+    // 更新商品資料
+    $sqlUpdate = "UPDATE products SET name = ?, price = ?, stock = ?, `condition` = ?, category = ?, description = ?, attachment = ? WHERE id = ?";
+    $stmtUpdate = mysqli_prepare($link, $sqlUpdate);
+    mysqli_stmt_bind_param($stmtUpdate, 'siissssi', $name, $price, $stock, $condition, $category, $description, $attachment, $productId);
+    mysqli_stmt_execute($stmtUpdate);
+
+    // 如果是管理員，導回商品管理頁面
+    if ($userType === 'Admin') {
+        header("Location: ../admin/productManagement.php");
+        exit();
+    }
+
+    // 如果是一般使用者，導回商品列表頁面
+    header("Location: showList.php");
     exit();
 }
 ?>
@@ -111,17 +168,15 @@ if (!$product) {
     </div>
 
     <h1>編輯商品</h1>
-    <form method="POST" action="update.php" enctype="multipart/form-data">
-        <input type="hidden" name="id" value="<?php echo htmlspecialchars($product['id']); ?>">
-
+    <form method="POST" action="" enctype="multipart/form-data">
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
 
         <label for="price">價格</label>
-        <input type="number" id="price" name="price" step="0.01" value="<?php echo htmlspecialchars($product['price']); ?>" required>
+        <input type="number" id="price" name="price" step="1" min="1" value="<?php echo htmlspecialchars($product['price']); ?>" required>
 
         <label for="stock">庫存</label>
-        <input type="number" id="stock" name="stock" value="<?php echo htmlspecialchars($product['stock']); ?>" required>
+        <input type="number" id="stock" name="stock" step="1" min="1" value="<?php echo htmlspecialchars($product['stock']); ?>" required>
 
         <label for="condition">商品狀況</label>
         <select id="condition" name="condition" required>
@@ -155,7 +210,7 @@ if (!$product) {
 
         <label for="attachment">商品圖片</label>
         <?php if (!empty($product['attachment'])): ?>
-            <img src="pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="商品圖片" class="current-image">
+            <img src="../product/pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="商品圖片" class="current-image">
         <?php endif; ?>
         <input type="file" id="attachment" name="attachment" accept="image/*">
 

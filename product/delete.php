@@ -10,8 +10,8 @@ if (!isset($_SESSION['user'])) {
 
 $userEmail = $_SESSION['user'];
 
-// 查詢使用者 ID
-$sqlUser = "SELECT No FROM accounts WHERE Email = ?";
+// 查詢使用者資訊
+$sqlUser = "SELECT No, Type FROM accounts WHERE Email = ?";
 $stmtUser = mysqli_prepare($link, $sqlUser);
 mysqli_stmt_bind_param($stmtUser, 's', $userEmail);
 mysqli_stmt_execute($stmtUser);
@@ -24,36 +24,50 @@ if (!$user) {
 }
 
 $userId = $user['No'];
+$userType = $user['Type']; // 確認使用者類型（User 或 Admin）
 
 // 確認商品 ID
-if (!isset($_GET['id'])) {
+$productId = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : null);
+
+if (!$productId) {
     echo "商品 ID 不存在！";
     exit();
 }
 
-$productId = intval($_GET['id']);
-
 // 查詢商品資料
-$sqlProduct = "SELECT attachment FROM products WHERE id = ? AND seller_id = ?";
-$stmtProduct = mysqli_prepare($link, $sqlProduct);
-mysqli_stmt_bind_param($stmtProduct, 'ii', $productId, $userId);
+if ($userType === 'Admin') {
+    // 管理員可以刪除任何商品
+    $sqlProduct = "SELECT attachment FROM products WHERE id = ?";
+    $stmtProduct = mysqli_prepare($link, $sqlProduct);
+    mysqli_stmt_bind_param($stmtProduct, 'i', $productId);
+} else {
+    // 一般使用者只能刪除自己的商品
+    $sqlProduct = "SELECT attachment FROM products WHERE id = ? AND seller_id = ?";
+    $stmtProduct = mysqli_prepare($link, $sqlProduct);
+    mysqli_stmt_bind_param($stmtProduct, 'ii', $productId, $userId);
+}
+
 mysqli_stmt_execute($stmtProduct);
 $resultProduct = mysqli_stmt_get_result($stmtProduct);
 $product = mysqli_fetch_assoc($resultProduct);
 
 if (!$product) {
-    echo "商品不存在或無權限刪除！";
+    echo "<script>alert('商品不存在或無權限刪除！'); history.back();</script>";
     exit();
 }
 
 // 標記商品為已刪除
-$sqlMarkDeleted = "UPDATE products SET is_deleted = 1 WHERE id = ? AND seller_id = ?";
+$sqlMarkDeleted = "UPDATE products SET is_deleted = 1 WHERE id = ?";
 $stmtMarkDeleted = mysqli_prepare($link, $sqlMarkDeleted);
-mysqli_stmt_bind_param($stmtMarkDeleted, 'ii', $productId, $userId);
+mysqli_stmt_bind_param($stmtMarkDeleted, 'i', $productId);
 mysqli_stmt_execute($stmtMarkDeleted);
 
 if (mysqli_stmt_affected_rows($stmtMarkDeleted) > 0) {
-    echo "<script>alert('商品已成功移除！'); location.href='showList.php';</script>";
+    if ($userType === 'Admin') {
+        echo "<script>alert('商品已成功移除！'); location.href='../admin/productManagement.php';</script>";
+    } else {
+        echo "<script>alert('商品已成功移除！'); location.href='showList.php';</script>";
+    }
 } else {
     echo "<script>alert('商品移除失敗！'); history.back();</script>";
 }
