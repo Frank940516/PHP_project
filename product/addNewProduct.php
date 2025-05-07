@@ -8,7 +8,35 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../login/login.php");
     exit();
 }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $author = $_POST['author'];
+    $price = $_POST['price'];
+    $stock = $_POST['stock'];
+    $condition = $_POST['condition'];
+    $category = $_POST['category'];
+    $description = $_POST['description'];
+    $attachment = $_FILES['attachment'];
+
+    if ($attachment['error'] === UPLOAD_ERR_OK) {
+        $targetDir = "../uploads/";
+        $targetFile = $targetDir . basename($attachment['name']);
+        move_uploaded_file($attachment['tmp_name'], $targetFile);
+    } else {
+        echo "圖片上傳失敗";
+        exit();
+    }
+
+    $stmt = $link->prepare("INSERT INTO products (name, author, price, stock, condition, category, description, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssdisiss", $name, $author, $price, $stock, $condition, $category, $description, $targetFile);
+    $stmt->execute();
+
+    header("Location: product_list.php");
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -35,13 +63,14 @@ if (!isset($_SESSION['user'])) {
         }
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-top: 10px;
             font-weight: bold;
         }
         input, textarea, select {
             width: 100%;
             padding: 8px;
-            margin-bottom: 16px;
+            margin-top: 5px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
@@ -59,7 +88,6 @@ if (!isset($_SESSION['user'])) {
     </style>
 </head>
 <body>
-    <!-- Top bar with back home button and user menu -->
     <div class="top-bar">
         <div class="back-home-button">
             <input type="button" value="返回首頁" onclick="location.href='../index.php'">
@@ -68,9 +96,12 @@ if (!isset($_SESSION['user'])) {
     </div>
 
     <h1>新增商品</h1>
-    <form method="POST" action="addCheck.php" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" required>
+
+        <label for="author">作者</label>
+        <input type="text" id="author" name="author" required>
 
         <label for="price">價格</label>
         <input type="number" id="price" name="price" step="0.01" required>
@@ -109,7 +140,7 @@ if (!isset($_SESSION['user'])) {
         <textarea id="description" name="description" rows="5" required></textarea>
 
         <label for="attachment">商品圖片</label>
-        <input type="file" id="attachment" name="attachment" accept="image/*"  required>
+        <input type="file" id="attachment" name="attachment" accept="image/*" required>
 
         <button type="submit">新增商品</button>
     </form>
