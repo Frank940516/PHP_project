@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = 'pic/';
             $fileExtension = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
-            $attachmentName = $userName . '-' . $productId . '.' . $fileExtension; // 用戶名稱-商品ID.副檔名
+            $attachmentName = $userId . '-' . $productId . '.' . $fileExtension; // 用戶ID-商品ID.副檔名
             $attachmentPath = $uploadDir . $attachmentName;
 
             // 確保目錄存在

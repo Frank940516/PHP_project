@@ -70,8 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $attachment = $product['attachment']; // 預設為原本的圖片
     if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = '../product/pic/';
-        $fileName = basename($_FILES['attachment']['name']);
-        $targetFilePath = $uploadDir . $fileName;
+        $fileExtension = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
+        $attachmentName = $userId . '-' . $productId . '.' . $fileExtension; // 用戶ID-商品ID.副檔名
+        $targetFilePath = $uploadDir . $attachmentName;
 
         // 確保目錄存在
         if (!is_dir($uploadDir)) {
@@ -80,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 移動上傳的檔案
         if (move_uploaded_file($_FILES['attachment']['tmp_name'], $targetFilePath)) {
-            $attachment = $fileName; // 更新圖片名稱
+            $attachment = $attachmentName; // 更新圖片名稱
         } else {
             echo "圖片上傳失敗！";
             exit();
