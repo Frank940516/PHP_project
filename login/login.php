@@ -102,13 +102,6 @@
     <div class="login-container">
         <div class="login-title">登入</div>
         <?php
-<<<<<<< HEAD
-        if (isset($_GET["error"])) {
-            if ($_GET["error"] == "password") {
-                echo "<div class='error-message'>密碼錯誤！</div>";
-            } elseif ($_GET["error"] == "email") {
-                echo "<div class='error-message'>帳號不存在！</div>";
-=======
         echo "已有帳號？請在此登入：<br>";
 
         if (isset($_GET['error'])) {
@@ -119,7 +112,6 @@
                 echo "<p style='color: red;'>密碼錯誤，請再試一次。</p>";
             } elseif ($_GET['error'] === 'email') {
                 echo "<p style='color: red;'>帳號不存在，請檢查電子郵件。</p>";
->>>>>>> origin/back-end
             }
         }
         ?>
