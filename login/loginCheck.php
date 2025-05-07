@@ -17,7 +17,15 @@ mysqli_set_charset($link, 'utf8');
         $result = mysqli_query($link, $sql);
         if (mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result); // account exists
-            if ($userPassword == $row["Password"]) { // check password
+
+            // 檢查使用者是否被封鎖
+            if ($row["Status"] === "blocked") {
+                header("Location: login.php?error=blocked&redirect=" . urlencode($redirectUrl));
+                exit();
+            }
+
+            // 檢查密碼是否正確
+            if ($userPassword == $row["Password"]) {
                 session_start();
                 $_SESSION["user"] = $row["Email"];
                 $_SESSION["name"] = $row["Name"];
@@ -39,3 +47,5 @@ mysqli_set_charset($link, 'utf8');
             exit();
         }
         ?>
+    </body>
+</html>

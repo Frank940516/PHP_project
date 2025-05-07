@@ -10,6 +10,12 @@ if (isset($_SESSION["user"])) {
                 <li><a href="/cart/buyHistory.php">購買紀錄</a></li>
                 <li><a href="/product/showList.php">管理訂單</a></li>
                 <li><a href="/product/sellHistory.php">訂單紀錄</a></li>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
+                <?php if ($_SESSION["type"] === "Admin"): ?>
+                    <li><a href="/admin/userManagement.php">使用者管理</a></li>
+                    <li><a href="/admin/productManagement.php">商品管理</a></li>
+                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
+                <?php endif; ?>
                 <li><a href="/login/logout.php">登出</a></li>
             </ul>
         </div>
@@ -29,11 +35,11 @@ if (isset($_SESSION["user"])) {
             right: 0;
             background-color: white;
             border: 1px solid #ccc;
-            border-radius: 8px; /* 圓角 */
+            border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-            width: 150px; /* 固定寬度 */
-            padding: 10px 0; /* 增加上下內邊距 */
+            width: 150px;
+            padding: 10px 0;
         }
         .menu-dropdown ul {
             list-style: none;
@@ -44,15 +50,20 @@ if (isset($_SESSION["user"])) {
             margin: 0;
         }
         .menu-dropdown ul li a {
-            display: block; /* 將連結設置為區塊元素 */
+            display: block;
             text-decoration: none;
             color: black;
-            padding: 10px 15px; /* 增加內邊距 */
+            padding: 10px 15px;
             transition: background-color 0.3s ease;
-            font-size: 14px; /* 調整字體大小 */
+            font-size: 14px;
         }
         .menu-dropdown ul li a:hover {
-            background-color: #f0f0f0; /* 懸停背景色 */
+            background-color: #f0f0f0;
+        }
+        .menu-dropdown hr {
+            margin: 10px 0;
+            border: 0;
+            border-top: 1px solid #ccc;
         }
     </style>
     <script>

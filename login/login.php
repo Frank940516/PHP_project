@@ -11,11 +11,13 @@
         <?php
         echo "已有帳號？請在此登入：<br>";
 
-        if (isset($_GET["error"])) {
-            if ($_GET["error"] == "password") {
-                echo "<p style='color: red;'>密碼錯誤！</p>";
-            } elseif ($_GET["error"] == "email") {
-                echo "<p style='color: red;'>帳號不存在！</p>";
+        if (isset($_GET['error'])) {
+            if ($_GET['error'] === 'blocked') {
+                echo "<p style='color: red;'>登入失敗，已被管理員封鎖。</p>";
+            } elseif ($_GET['error'] === 'password') {
+                echo "<p style='color: red;'>密碼錯誤，請再試一次。</p>";
+            } elseif ($_GET['error'] === 'email') {
+                echo "<p style='color: red;'>帳號不存在，請檢查電子郵件。</p>";
             }
         }
         ?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-05-06 17:49:09
+-- 產生時間： 2025-05-07 10:55:26
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -32,20 +32,20 @@ CREATE TABLE `accounts` (
   `Email` varchar(100) NOT NULL,
   `Password` varchar(100) NOT NULL,
   `Name` varchar(100) NOT NULL,
-  `Type` varchar(100) NOT NULL
+  `Type` varchar(100) NOT NULL,
+  `Status` enum('active','blocked') NOT NULL DEFAULT 'active',
+  `block_reason` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- 傾印資料表的資料 `accounts`
 --
 
-INSERT INTO `accounts` (`No`, `Email`, `Password`, `Name`, `Type`) VALUES
-(1, 'test@gmail.com', 'test1234', 'Ayaya .w.Ayaya .w.', 'Admin'),
-(2, '12121', '121212', '12121', 'User'),
-(4, 'test', 'ee', 'TEST', 'User'),
-(5, '1111111111111', '11111111111111', '1111111111111', 'User'),
-(6, 'test2@gmail.com', 'test2test', 'TESTADMIN2', 'Admin'),
-(7, 'testUser@gmail.com', 'test1234', '1234USER', 'User');
+INSERT INTO `accounts` (`No`, `Email`, `Password`, `Name`, `Type`, `Status`, `block_reason`) VALUES
+(1, 'test@gmail.com', 'test1234', 'Ayaya .w.Ayaya .w.', 'Admin', 'active', NULL),
+(2, '12121', '121212', '12121', 'User', 'blocked', '123'),
+(4, 'test', 'ee', 'TEST123', 'User', 'active', NULL),
+(6, 'test2@gmail.com', 'test2test', 'TESTADMIN2', 'Admin', 'active', NULL);
 
 -- --------------------------------------------------------
 
@@ -276,7 +276,7 @@ ALTER TABLE `order_items`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- 已傾印資料表的限制式

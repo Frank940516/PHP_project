@@ -267,8 +267,8 @@
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                 <?php $firstRow = array_slice($categories, 0, 7); // 取前 7 個 ?>
                 <?php foreach ($firstRow as $category): ?>
-                    <a href="index.php?category=<?php echo urlencode($category); ?>" 
-                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo $categoryFilter === $category ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo $categoryFilter === $category ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                    <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
+                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
                         <?php echo htmlspecialchars($category); ?>
                     </a>
                 <?php endforeach; ?>
@@ -278,8 +278,8 @@
             <div style="display: flex; justify-content: space-between;">
                 <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
                 <?php foreach ($secondRow as $category): ?>
-                    <a href="index.php?category=<?php echo urlencode($category); ?>" 
-                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo $categoryFilter === $category ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo $categoryFilter === $category ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                    <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
+                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
                         <?php echo htmlspecialchars($category); ?>
                     </a>
                 <?php endforeach; ?>

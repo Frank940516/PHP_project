@@ -9,6 +9,7 @@ $previousPage = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '..
 
 // 定義需要登入的資料夾
 $protectedFolders = [
+    '/admin/',
     '/product/',
     '/profile/',
     '/cart/',
