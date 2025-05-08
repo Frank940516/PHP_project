@@ -85,16 +85,23 @@
         .register-link:hover {
             text-decoration: underline;
         }
-        .error-message {
-            color: #e53935;
-            background: #fff3f3;
-            border: 1px solid #ffcdd2;
-            border-radius: 6px;
-            padding: 8px 12px;
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #1976d2;
+        }
+        .toggle-password:hover {
+            color: #1565c0;
+        }
+        .password-container {
+            position: relative;
             margin-bottom: 18px;
-            width: 100%;
-            text-align: center;
-            font-size: 1rem;
         }
     </style>
 </head>
@@ -120,10 +127,26 @@
             <label for="email">郵件</label>
             <input type="text" id="email" name="email" required>
             <label for="password">密碼</label>
-            <input type="password" id="password" name="password" required>
+            <div class="password-container">
+                <input type="password" id="password" name="password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+            </div>
             <input class="login-btn" type="submit" value="登入">
         </form>
         <a class="register-link" href="register.php">沒有帳號嗎？請註冊</a>
     </div>
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const toggleButton = document.querySelector('.toggle-password');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleButton.textContent = '🙈';
+            } else {
+                passwordField.type = 'password';
+                toggleButton.textContent = '👁️';
+            }
+        }
+    </script>
 </body>
 </html>
