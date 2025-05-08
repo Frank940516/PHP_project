@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-05-08 07:27:24
+-- 產生時間： 2025-05-08 11:27:48
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -83,6 +83,33 @@ CREATE TABLE `cart` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `coupons`
+--
+
+CREATE TABLE `coupons` (
+  `id` int(11) NOT NULL,
+  `code` varchar(20) NOT NULL COMMENT '優惠券代碼，最多 20 個字元',
+  `discount` decimal(5,2) NOT NULL COMMENT '折扣百分比',
+  `expiration_date` date NOT NULL COMMENT '到期日',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否有效 (2:未生效 1: 有效, 0: 無效)',
+  `start_date` date NOT NULL DEFAULT curdate() COMMENT '開始生效日期'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 傾印資料表的資料 `coupons`
+--
+
+INSERT INTO `coupons` (`id`, `code`, `discount`, `expiration_date`, `is_active`, `start_date`) VALUES
+(1, 'WELCOME10', 10.00, '2025-12-31', 2, '2025-05-14'),
+(2, 'SUMMER20', 20.00, '2025-08-31', 1, '2025-05-08'),
+(3, 'BLACKFRIDAY50', 50.00, '2025-11-30', 1, '2025-05-08'),
+(4, 'EXPIRED5', 5.00, '2024-12-31', 0, '2025-05-08'),
+(5, '1222222', 50.00, '2025-05-30', 2, '2025-05-14'),
+(6, 'test coupon', 12.00, '2025-05-31', 1, '2025-05-08');
 
 -- --------------------------------------------------------
 
@@ -191,6 +218,25 @@ INSERT INTO `products` (`id`, `name`, `author`, `category`, `seller_id`, `condit
 (17, 'Java Advanced Textbook', '', '考試用書/教科書', 1, '九成新', '去年買的', '', 'Ayaya .w.Ayaya .w.-17.png', 800, 12, '2025-05-06 22:07:52', '2025-05-06 22:07:52', 0),
 (22, 'test new field', 'new author:)', '漫畫/輕小說', 1, '九成新', '1111', 'Taiwan:)', '1-22.png', 111, 10, '2025-05-07 23:46:58', '2025-05-08 10:56:24', 0);
 
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `user_coupons`
+--
+
+CREATE TABLE `user_coupons` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL COMMENT '使用者 ID',
+  `coupon_id` int(11) NOT NULL COMMENT '優惠券 ID'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 傾印資料表的資料 `user_coupons`
+--
+
+INSERT INTO `user_coupons` (`id`, `user_id`, `coupon_id`) VALUES
+(2, 4, 1);
+
 --
 -- 已傾印資料表的索引
 --
@@ -217,6 +263,13 @@ ALTER TABLE `cart`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- 資料表索引 `coupons`
+--
+ALTER TABLE `coupons`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
 -- 資料表索引 `orders`
 --
 ALTER TABLE `orders`
@@ -237,6 +290,14 @@ ALTER TABLE `order_items`
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`),
   ADD KEY `seller_id` (`seller_id`);
+
+--
+-- 資料表索引 `user_coupons`
+--
+ALTER TABLE `user_coupons`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `coupon_id` (`coupon_id`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -261,6 +322,12 @@ ALTER TABLE `cart`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
+-- 使用資料表自動遞增(AUTO_INCREMENT) `coupons`
+--
+ALTER TABLE `coupons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- 使用資料表自動遞增(AUTO_INCREMENT) `orders`
 --
 ALTER TABLE `orders`
@@ -277,6 +344,12 @@ ALTER TABLE `order_items`
 --
 ALTER TABLE `products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `user_coupons`
+--
+ALTER TABLE `user_coupons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- 已傾印資料表的限制式
@@ -312,6 +385,13 @@ ALTER TABLE `order_items`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `accounts` (`No`) ON DELETE CASCADE;
+
+--
+-- 資料表的限制式 `user_coupons`
+--
+ALTER TABLE `user_coupons`
+  ADD CONSTRAINT `user_coupons_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`No`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_coupons_ibfk_2` FOREIGN KEY (`coupon_id`) REFERENCES `coupons` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
