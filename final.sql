@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-05-08 11:27:48
+-- 產生時間： 2025-05-08 16:53:15
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -93,23 +93,27 @@ CREATE TABLE `cart` (
 CREATE TABLE `coupons` (
   `id` int(11) NOT NULL,
   `code` varchar(20) NOT NULL COMMENT '優惠券代碼，最多 20 個字元',
-  `discount` decimal(5,2) NOT NULL COMMENT '折扣百分比',
+  `discount` decimal(5,2) NOT NULL COMMENT '折扣百分比/金額',
   `expiration_date` date NOT NULL COMMENT '到期日',
   `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否有效 (2:未生效 1: 有效, 0: 無效)',
-  `start_date` date NOT NULL DEFAULT curdate() COMMENT '開始生效日期'
+  `start_date` date NOT NULL DEFAULT curdate() COMMENT '開始生效日期',
+  `discount_type` enum('percentage','fixed') NOT NULL DEFAULT 'percentage',
+  `redeem_limit` int(11) NOT NULL DEFAULT 1,
+  `redeem_count` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- 傾印資料表的資料 `coupons`
 --
 
-INSERT INTO `coupons` (`id`, `code`, `discount`, `expiration_date`, `is_active`, `start_date`) VALUES
-(1, 'WELCOME10', 10.00, '2025-12-31', 2, '2025-05-14'),
-(2, 'SUMMER20', 20.00, '2025-08-31', 1, '2025-05-08'),
-(3, 'BLACKFRIDAY50', 50.00, '2025-11-30', 1, '2025-05-08'),
-(4, 'EXPIRED5', 5.00, '2024-12-31', 0, '2025-05-08'),
-(5, '1222222', 50.00, '2025-05-30', 2, '2025-05-14'),
-(6, 'test coupon', 12.00, '2025-05-31', 1, '2025-05-08');
+INSERT INTO `coupons` (`id`, `code`, `discount`, `expiration_date`, `is_active`, `start_date`, `discount_type`, `redeem_limit`, `redeem_count`) VALUES
+(1, 'WELCOME10', 10.00, '2025-12-31', 2, '2025-05-14', 'percentage', 1, 0),
+(2, 'SUMMER20', 20.00, '2025-08-31', 1, '2025-05-08', 'percentage', 1, 0),
+(3, 'BLACKFRIDAY50', 25.00, '2025-11-29', 1, '2025-05-08', 'percentage', 10, 1),
+(4, 'EXPIRED5', 5.00, '2024-12-31', 0, '2025-05-08', 'percentage', 1, 1),
+(7, 'LIMITED', 10.00, '2025-05-08', 0, '2025-05-08', 'percentage', 2, 2),
+(8, '!', 100.00, '2025-05-09', 2, '2025-05-09', 'fixed', 1, 0),
+(11, 'test%&$', 100.00, '2025-06-04', 1, '2025-05-08', 'fixed', 5, 2);
 
 -- --------------------------------------------------------
 
@@ -123,32 +127,35 @@ CREATE TABLE `orders` (
   `total_amount` decimal(10,0) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `payment_method` varchar(50) NOT NULL COMMENT '付款方式'
+  `payment_method` varchar(50) NOT NULL COMMENT '付款方式',
+  `coupon_code` varchar(50) DEFAULT NULL COMMENT '使用的優惠券代碼',
+  `coupon_discount` decimal(10,2) DEFAULT NULL COMMENT '優惠券折扣金額'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- 傾印資料表的資料 `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `created_at`, `updated_at`, `payment_method`) VALUES
-(1, 1, 600, '2025-05-05 08:59:02', '2025-05-05 08:59:02', ''),
-(2, 1, 661, '2025-05-05 09:19:55', '2025-05-05 09:19:55', ''),
-(3, 1, 1500, '2025-05-05 09:20:50', '2025-05-05 09:20:50', ''),
-(4, 1, 900, '2025-05-05 12:44:11', '2025-05-05 12:44:11', ''),
-(5, 1, 300, '2025-05-05 12:47:14', '2025-05-05 12:47:14', ''),
-(6, 4, 300, '2025-05-05 13:09:11', '2025-05-05 13:09:11', ''),
-(7, 4, 24, '2025-05-05 13:09:38', '2025-05-05 13:09:38', ''),
-(8, 1, 121, '2025-05-05 13:29:03', '2025-05-05 13:29:03', ''),
-(9, 1, 600, '2025-05-06 11:37:44', '2025-05-06 11:37:44', ''),
-(10, 6, 500, '2025-05-06 12:38:33', '2025-05-06 12:38:33', ''),
-(11, 4, 500, '2025-05-06 12:39:33', '2025-05-06 12:39:33', ''),
-(12, 6, 12, '2025-05-06 12:40:06', '2025-05-06 12:40:06', ''),
-(13, 1, 300, '2025-05-06 12:53:48', '2025-05-06 12:53:48', ''),
-(14, 4, 111, '2025-05-08 02:56:24', '2025-05-08 02:56:24', ''),
-(15, 1, 300, '2025-05-08 03:41:02', '2025-05-08 03:41:02', ''),
-(16, 1, 121, '2025-05-08 03:41:20', '2025-05-08 03:41:20', ''),
-(17, 1, 121, '2025-05-08 03:45:21', '2025-05-08 03:45:21', 'paypal'),
-(18, 1, 121, '2025-05-08 03:49:28', '2025-05-08 03:49:28', 'bank_transfer');
+INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `created_at`, `updated_at`, `payment_method`, `coupon_code`, `coupon_discount`) VALUES
+(1, 1, 600, '2025-05-05 08:59:02', '2025-05-05 08:59:02', '', NULL, NULL),
+(2, 1, 661, '2025-05-05 09:19:55', '2025-05-05 09:19:55', '', NULL, NULL),
+(3, 1, 1500, '2025-05-05 09:20:50', '2025-05-05 09:20:50', '', NULL, NULL),
+(4, 1, 900, '2025-05-05 12:44:11', '2025-05-05 12:44:11', '', NULL, NULL),
+(5, 1, 300, '2025-05-05 12:47:14', '2025-05-05 12:47:14', '', NULL, NULL),
+(6, 4, 300, '2025-05-05 13:09:11', '2025-05-05 13:09:11', '', NULL, NULL),
+(7, 4, 24, '2025-05-05 13:09:38', '2025-05-05 13:09:38', '', NULL, NULL),
+(8, 1, 121, '2025-05-05 13:29:03', '2025-05-05 13:29:03', '', NULL, NULL),
+(9, 1, 600, '2025-05-06 11:37:44', '2025-05-06 11:37:44', '', NULL, NULL),
+(10, 6, 500, '2025-05-06 12:38:33', '2025-05-06 12:38:33', '', NULL, NULL),
+(11, 4, 500, '2025-05-06 12:39:33', '2025-05-06 12:39:33', '', NULL, NULL),
+(12, 6, 12, '2025-05-06 12:40:06', '2025-05-06 12:40:06', '', NULL, NULL),
+(13, 1, 300, '2025-05-06 12:53:48', '2025-05-06 12:53:48', '', NULL, NULL),
+(14, 4, 111, '2025-05-08 02:56:24', '2025-05-08 02:56:24', '', NULL, NULL),
+(15, 1, 300, '2025-05-08 03:41:02', '2025-05-08 03:41:02', '', NULL, NULL),
+(16, 1, 121, '2025-05-08 03:41:20', '2025-05-08 03:41:20', '', NULL, NULL),
+(17, 1, 121, '2025-05-08 03:45:21', '2025-05-08 03:45:21', 'paypal', NULL, NULL),
+(18, 1, 121, '2025-05-08 03:49:28', '2025-05-08 03:49:28', 'bank_transfer', NULL, NULL),
+(19, 4, 111, '2025-05-08 14:51:26', '2025-05-08 14:51:26', 'credit_card', NULL, 0.00);
 
 -- --------------------------------------------------------
 
@@ -182,7 +189,8 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`, 
 (17, 15, 11, 1, 300, 300),
 (18, 16, 15, 1, 121, 121),
 (19, 17, 15, 1, 121, 121),
-(20, 18, 15, 1, 121, 121);
+(20, 18, 15, 1, 121, 121),
+(21, 19, 22, 1, 111, 111);
 
 -- --------------------------------------------------------
 
@@ -216,7 +224,7 @@ INSERT INTO `products` (`id`, `name`, `author`, `category`, `seller_id`, `condit
 (13, 'more books', '', '文學/小說', 1, '九成新', '前年買的，沒什麼畫過\r\n需要者收，可議價', '', 'Ayaya-13.png', 150, 3, '2025-05-05 10:39:04', '2025-05-07 21:57:34', 0),
 (15, '1212', 'test author', '文學/小說', 4, '五成新', 'idk', 'Earth', '1-15.png', 121, 1, '2025-05-05 21:10:53', '2025-05-08 11:49:28', 0),
 (17, 'Java Advanced Textbook', '', '考試用書/教科書', 1, '九成新', '去年買的', '', 'Ayaya .w.Ayaya .w.-17.png', 800, 12, '2025-05-06 22:07:52', '2025-05-06 22:07:52', 0),
-(22, 'test new field', 'new author:)', '漫畫/輕小說', 1, '九成新', '1111', 'Taiwan:)', '1-22.png', 111, 10, '2025-05-07 23:46:58', '2025-05-08 10:56:24', 0);
+(22, 'test new field', 'new author:)', '漫畫/輕小說', 1, '九成新', '1111', 'Taiwan:)', '1-22.png', 111, 9, '2025-05-07 23:46:58', '2025-05-08 22:51:26', 0);
 
 -- --------------------------------------------------------
 
@@ -227,15 +235,18 @@ INSERT INTO `products` (`id`, `name`, `author`, `category`, `seller_id`, `condit
 CREATE TABLE `user_coupons` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT '使用者 ID',
-  `coupon_id` int(11) NOT NULL COMMENT '優惠券 ID'
+  `coupon_id` int(11) NOT NULL COMMENT '優惠券 ID',
+  `redeem_time` datetime NOT NULL DEFAULT current_timestamp(),
+  `is_used` tinyint(1) DEFAULT 0 COMMENT '是否已使用 (0: 未使用, 1: 已使用)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- 傾印資料表的資料 `user_coupons`
 --
 
-INSERT INTO `user_coupons` (`id`, `user_id`, `coupon_id`) VALUES
-(2, 4, 1);
+INSERT INTO `user_coupons` (`id`, `user_id`, `coupon_id`, `redeem_time`, `is_used`) VALUES
+(5, 4, 11, '2025-05-08 21:23:27', 0),
+(6, 4, 3, '2025-05-08 21:25:49', 0);
 
 --
 -- 已傾印資料表的索引
@@ -319,25 +330,25 @@ ALTER TABLE `announcement`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `coupons`
 --
 ALTER TABLE `coupons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
@@ -349,7 +360,7 @@ ALTER TABLE `products`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `user_coupons`
 --
 ALTER TABLE `user_coupons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- 已傾印資料表的限制式

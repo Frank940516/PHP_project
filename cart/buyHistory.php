@@ -27,7 +27,8 @@ if (!$user) {
 $userId = $user['No'];
 
 // 查詢購買紀錄
-$sqlHistory = "SELECT o.id AS order_id, o.total_amount, o.created_at, o.payment_method, -- 新增 payment_method 欄位
+$sqlHistory = "SELECT o.id AS order_id, o.total_amount, o.created_at, o.payment_method, 
+                      o.coupon_code, o.coupon_discount, -- 新增優惠券相關欄位
                       oi.product_id, p.name AS product_name, p.attachment, p.is_deleted, 
                       oi.quantity, oi.price, oi.subtotal, p.category, p.author, p.location, 
                       a.No AS seller_id, a.Name AS seller_name
@@ -111,6 +112,10 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
             text-align: right;
             background-color: #f9f9f9;
         }
+        .coupon-info {
+            font-size: 14px;
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -175,8 +180,15 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                         <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
             <?php if (end($buyRecords) === $record || $currentProductId !== $buyRecords[array_search($record, $buyRecords) + 1]['product_id']): ?>
                     <tr class="total-row">
-                        <td colspan="7">總金額：</td>
-                        <td><?php echo htmlspecialchars($productTotal); ?></td>
+                        <td colspan="6">
+                            <?php if (!empty($record['coupon_code'])): ?>
+                                <div class="coupon-info">
+                                    使用優惠券：<?php echo htmlspecialchars($record['coupon_code']); ?>，折扣金額：<?php echo htmlspecialchars($record['coupon_discount']); ?>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <td>總金額：</td>
+                        <td><?php echo htmlspecialchars($record['total_amount']); ?></td>
                     </tr>
                     </tbody>
                 </table>

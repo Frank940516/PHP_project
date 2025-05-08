@@ -1,4 +1,4 @@
-<?php
+<?php //admin parts not fully fixed (:
 require('../db.inc');
 session_start(); // 確保啟用 session
 mysqli_set_charset($link, 'utf8');
@@ -32,47 +32,59 @@ $isAdmin = $user['Type'] === 'Admin'; // 判斷是否為管理員
 $redeemMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['redeem_code'])) {
     $redeemCode = trim($_POST['redeem_code']);
-    $sqlRedeem = "SELECT id, is_active FROM coupons WHERE code = ? AND expiration_date >= CURDATE()";
+    $sqlRedeem = "SELECT id, is_active, redeem_limit, redeem_count, start_date, expiration_date 
+                  FROM coupons 
+                  WHERE code = ? AND expiration_date >= CURDATE()";
     $stmtRedeem = mysqli_prepare($link, $sqlRedeem);
     mysqli_stmt_bind_param($stmtRedeem, 's', $redeemCode);
     mysqli_stmt_execute($stmtRedeem);
     $resultRedeem = mysqli_stmt_get_result($stmtRedeem);
     $coupon = mysqli_fetch_assoc($resultRedeem);
 
-    if ($coupon && $coupon['is_active']) {
-        // 檢查是否已兌換
-        $sqlCheck = "SELECT * FROM user_coupons WHERE user_id = ? AND coupon_id = ?";
-        $stmtCheck = mysqli_prepare($link, $sqlCheck);
-        mysqli_stmt_bind_param($stmtCheck, 'ii', $userId, $coupon['id']);
-        mysqli_stmt_execute($stmtCheck);
-        $resultCheck = mysqli_stmt_get_result($stmtCheck);
+    if ($coupon && isset($coupon['is_active'])) {
+        if ($coupon['is_active'] == 1 && $coupon['redeem_count'] < $coupon['redeem_limit']) {
+            // 檢查是否已兌換
+            $sqlCheck = "SELECT * FROM user_coupons WHERE user_id = ? AND coupon_id = ?";
+            $stmtCheck = mysqli_prepare($link, $sqlCheck);
+            mysqli_stmt_bind_param($stmtCheck, 'ii', $userId, $coupon['id']);
+            mysqli_stmt_execute($stmtCheck);
+            $resultCheck = mysqli_stmt_get_result($stmtCheck);
 
-        if (mysqli_num_rows($resultCheck) === 0) {
-            // 新增到 user_coupons
-            $sqlInsert = "INSERT INTO user_coupons (user_id, coupon_id) VALUES (?, ?)";
-            $stmtInsert = mysqli_prepare($link, $sqlInsert);
-            mysqli_stmt_bind_param($stmtInsert, 'ii', $userId, $coupon['id']);
-            mysqli_stmt_execute($stmtInsert);
-            $redeemMessage = '<span style="color: green;">優惠券兌換成功！</span>';
+            if (mysqli_num_rows($resultCheck) === 0) {
+                // 新增到 user_coupons 並更新兌換次數
+                $sqlInsert = "INSERT INTO user_coupons (user_id, coupon_id) VALUES (?, ?)";
+                $stmtInsert = mysqli_prepare($link, $sqlInsert);
+                mysqli_stmt_bind_param($stmtInsert, 'ii', $userId, $coupon['id']);
+                mysqli_stmt_execute($stmtInsert);
+
+                $sqlUpdateCount = "UPDATE coupons SET redeem_count = redeem_count + 1 WHERE id = ?";
+                $stmtUpdateCount = mysqli_prepare($link, $sqlUpdateCount);
+                mysqli_stmt_bind_param($stmtUpdateCount, 'i', $coupon['id']);
+                mysqli_stmt_execute($stmtUpdateCount);
+
+                $redeemMessage = '<span style="color: green;">優惠券兌換成功！</span>';
+            } else {
+                $redeemMessage = '<span style="color: orange;">您已兌換過此優惠券！</span>';
+            }
         } else {
-            $redeemMessage = '<span style="color: orange;">您已兌換過此優惠券！</span>';
+            $redeemMessage = '<span style="color: red;">無效的兌換碼！</span>';
         }
     } else {
-        $redeemMessage = '<span style="color: red;">無效的優惠券兌換碼！</span>';
+        $redeemMessage = '<span style="color: red;">無效的兌換碼！</span>';
     }
 }
 
 // 查詢優惠券
 if ($isAdmin) {
-    // 管理員查看所有優惠券
-    $sql = "SELECT id, code, discount, start_date, expiration_date, is_active FROM coupons ORDER BY start_date ASC, expiration_date ASC";
+    $sql = "SELECT id, code, discount, discount_type, start_date, expiration_date, is_active, redeem_count, redeem_limit 
+            FROM coupons 
+            ORDER BY start_date ASC, expiration_date ASC";
     $stmt = mysqli_prepare($link, $sql);
 } else {
-    // 一般使用者僅查看已兌換的有效優惠券
-    $sql = "SELECT c.id, c.code, c.discount, c.start_date, c.expiration_date 
+    $sql = "SELECT c.id, c.code, c.discount, c.discount_type, c.start_date, c.expiration_date, c.is_active 
             FROM coupons c
             JOIN user_coupons uc ON c.id = uc.coupon_id
-            WHERE uc.user_id = ? AND c.is_active = 1 AND c.expiration_date >= CURDATE() AND c.start_date <= CURDATE()
+            WHERE uc.user_id = ? AND uc.is_used = 0 AND c.is_active = 1 AND c.expiration_date >= CURDATE() AND c.start_date <= CURDATE()
             ORDER BY c.start_date ASC, c.expiration_date ASC";
     $stmt = mysqli_prepare($link, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $userId);
@@ -83,6 +95,29 @@ $result = mysqli_stmt_get_result($stmt);
 if (!$result) {
     die("查詢失敗：" . mysqli_error($link));
 }
+
+// 查詢已失效的優惠券（is_active = 0）
+if ($isAdmin) {
+    $sqlExpired = "SELECT id, code, discount, discount_type, start_date, expiration_date, redeem_count, redeem_limit 
+                   FROM coupons 
+                   WHERE is_active = 0 
+                   ORDER BY expiration_date ASC";
+    $stmtExpired = mysqli_prepare($link, $sqlExpired);
+    mysqli_stmt_execute($stmtExpired);
+    $resultExpired = mysqli_stmt_get_result($stmtExpired);
+}
+
+// 查詢已使用過的優惠券
+$sqlUsedCoupons = "
+    SELECT c.id, c.code, c.discount, c.discount_type, c.start_date, c.expiration_date, c.redeem_count, c.redeem_limit
+    FROM coupons c
+    JOIN user_coupons uc ON c.id = uc.coupon_id
+    WHERE uc.user_id = ? AND uc.is_used = 1
+    ORDER BY c.expiration_date ASC";
+$stmtUsedCoupons = mysqli_prepare($link, $sqlUsedCoupons);
+mysqli_stmt_bind_param($stmtUsedCoupons, 'i', $userId);
+mysqli_stmt_execute($stmtUsedCoupons);
+$resultUsedCoupons = mysqli_stmt_get_result($stmtUsedCoupons);
 ?>
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -183,6 +218,11 @@ if (!$result) {
             font-size: 16px;
             color: #555;
         }
+        .expired-coupons-title {
+            margin-top: 40px;
+            font-size: 20px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -206,17 +246,19 @@ if (!$result) {
         </div>
     <?php endif; ?>
 
+    <!-- 可用優惠券 -->
     <?php if (mysqli_num_rows($result) > 0): ?>
+        <h2>可用的優惠券</h2>
         <table>
             <thead>
                 <tr>
                     <th>優惠券代碼</th>
-                    <th>折扣 (%)</th>
+                    <th>折扣</th>
                     <th>開始生效日期</th>
                     <th>到期日</th>
                     <?php if ($isAdmin): ?>
-                        <th>狀態</th>
-                        <th>操作</th>
+                        <th>兌換次數</th>
+                        <th>操作</th> <!-- 新增操作列 -->
                     <?php endif; ?>
                 </tr>
             </thead>
@@ -224,19 +266,17 @@ if (!$result) {
                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['code']); ?></td>
-                        <td><?php echo htmlspecialchars($row['discount']); ?>%</td>
+                        <td>
+                            <?php if ($row['discount_type'] === 'percentage'): ?>
+                                <?php echo htmlspecialchars($row['discount']); ?>%
+                            <?php elseif ($row['discount_type'] === 'fixed'): ?>
+                                $<?php echo htmlspecialchars($row['discount']); ?>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($row['start_date']); ?></td>
                         <td><?php echo htmlspecialchars($row['expiration_date']); ?></td>
                         <?php if ($isAdmin): ?>
-                            <td>
-                                <?php if ($row['is_active'] == 1): ?>
-                                    <span style="color: green;">有效</span>
-                                <?php elseif ($row['is_active'] == 0): ?>
-                                    <span style="color: red;">無效</span>
-                                <?php elseif ($row['is_active'] == 2): ?>
-                                    <span style="color: orange;">未生效</span>
-                                <?php endif; ?>
-                            </td>
+                            <td><?php echo htmlspecialchars($row['redeem_count']); ?> / <?php echo htmlspecialchars($row['redeem_limit']); ?></td>
                             <td>
                                 <form action="editCoupon.php" method="GET" style="display: inline;">
                                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
@@ -254,6 +294,92 @@ if (!$result) {
         </table>
     <?php else: ?>
         <p class="no-coupons">目前沒有可用的優惠券。</p>
+    <?php endif; ?>
+
+    <!-- 已使用過的優惠券 -->
+    <?php if (mysqli_num_rows($resultUsedCoupons) > 0): ?>
+        <h2>已用過的優惠券</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>優惠券代碼</th>
+                    <th>折扣</th>
+                    <th>開始生效日期</th>
+                    <th>到期日</th>
+                    <?php if ($isAdmin): ?>
+                        <th>兌換次數</th>
+                    <?php endif; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($rowUsed = mysqli_fetch_assoc($resultUsedCoupons)): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($rowUsed['code']); ?></td>
+                        <td>
+                            <?php if ($rowUsed['discount_type'] === 'percentage'): ?>
+                                <?php echo htmlspecialchars($rowUsed['discount']); ?>%
+                            <?php elseif ($rowUsed['discount_type'] === 'fixed'): ?>
+                                $<?php echo htmlspecialchars($rowUsed['discount']); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($rowUsed['start_date']); ?></td>
+                        <td><?php echo htmlspecialchars($rowUsed['expiration_date']); ?></td>
+                        <?php if ($isAdmin): ?>
+                            <td><?php echo htmlspecialchars($rowUsed['redeem_count']); ?> / <?php echo htmlspecialchars($rowUsed['redeem_limit']); ?></td>
+                        <?php endif; ?>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p class="no-coupons">目前沒有已用過的優惠券。</p>
+    <?php endif; ?>
+
+    <?php if ($isAdmin && mysqli_num_rows($resultExpired) > 0): ?>
+        <h2 class="expired-coupons-title">已失效的優惠券</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>優惠券代碼</th>
+                    <th>折扣</th>
+                    <th>開始生效日期</th>
+                    <th>到期日</th>
+                    <th>兌換次數</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($rowExpired = mysqli_fetch_assoc($resultExpired)): ?>
+                    <tr>
+                        <td>
+                            <a href="showRedeemUser.php?coupon_id=<?php echo htmlspecialchars($rowExpired['id']); ?>">
+                                <?php echo htmlspecialchars($rowExpired['code']); ?>
+                            </a>
+                        </td>
+                        <td>
+                            <?php if ($rowExpired['discount_type'] === 'percentage'): ?>
+                                <?php echo htmlspecialchars($rowExpired['discount']); ?>%
+                            <?php elseif ($rowExpired['discount_type'] === 'fixed'): ?>
+                                $<?php echo htmlspecialchars($rowExpired['discount']); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($rowExpired['start_date']); ?></td>
+                        <td><?php echo htmlspecialchars($rowExpired['expiration_date']); ?></td>
+                        <td><?php echo htmlspecialchars($rowExpired['redeem_count']); ?> / <?php echo htmlspecialchars($rowExpired['redeem_limit']); ?></td>
+                        <td>
+                            <form action="editCoupon.php" method="GET" style="display: inline;">
+                                <input type="hidden" name="id" value="<?php echo htmlspecialchars($rowExpired['id']); ?>">
+                                <button type="submit" class="action-button edit-button">編輯</button>
+                            </form>
+                            <form action="deleteCoupon.php" method="POST" style="display: inline;" onsubmit="return confirm('確定要刪除此優惠券嗎？')">
+                                <input type="hidden" name="id" value="<?php echo htmlspecialchars($rowExpired['id']); ?>">
+                                <button type="submit" class="action-button delete-button">刪除</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
     <?php endif; ?>
 
     <?php mysqli_close($link); ?>

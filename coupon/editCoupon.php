@@ -43,9 +43,12 @@ if (!$coupon) {
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = trim($_POST['code']);
+    $discountType = $_POST['discount_type'];
     $discount = floatval($_POST['discount']);
+    $discount = ($discount == intval($discount)) ? intval($discount) : $discount; // 格式化折扣值
     $startDate = $_POST['start_date'];
     $expirationDate = $_POST['expiration_date'];
+    $redeemLimit = intval($_POST['redeem_limit']);
 
     // 根據開始日期和到期日期自動設定生效狀態
     $currentDate = date('Y-m-d');
@@ -63,21 +66,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $expirationDate)) {
         $message = '<span style="color: red;">無效的到期日格式！</span>';
     } elseif ($code && $discount > 0 && $startDate && $expirationDate) {
-        $sqlUpdate = "UPDATE coupons SET code = ?, discount = ?, start_date = ?, expiration_date = ?, is_active = ? WHERE id = ?";
-        $stmtUpdate = mysqli_prepare($link, $sqlUpdate);
-        mysqli_stmt_bind_param($stmtUpdate, 'sdssii', $code, $discount, $startDate, $expirationDate, $isActive, $couponId);
-
-        if (mysqli_stmt_execute($stmtUpdate)) {
-            if (mysqli_stmt_affected_rows($stmtUpdate) > 0) {
-                // 更新成功後跳轉
-                header("Location: couponList.php");
-                exit();
-            } else {
-                $message = '<span style="color: orange;">未更新任何資料，可能是資料未變更。</span>';
-            }
+        // 檢查是否有重複的優惠券代碼（排除自己）
+        $sqlCheck = "SELECT id FROM coupons WHERE code = ? AND id != ?";
+        $stmtCheck = mysqli_prepare($link, $sqlCheck);
+        mysqli_stmt_bind_param($stmtCheck, 'si', $code, $couponId);
+        mysqli_stmt_execute($stmtCheck);
+        mysqli_stmt_store_result($stmtCheck);
+        if (mysqli_stmt_num_rows($stmtCheck) > 0) {
+            $message = '<span style="color: red;">已有相同名稱的優惠券，請更換優惠券代碼！</span>';
         } else {
-            $message = '<span style="color: red;">更新失敗：' . mysqli_error($link) . '</span>';
+            $sqlUpdate = "UPDATE coupons SET code = ?, discount = ?, discount_type = ?, start_date = ?, expiration_date = ?, is_active = ?, redeem_limit = ? WHERE id = ?";
+            $stmtUpdate = mysqli_prepare($link, $sqlUpdate);
+            mysqli_stmt_bind_param($stmtUpdate, 'sdsssiii', $code, $discount, $discountType, $startDate, $expirationDate, $isActive, $redeemLimit, $couponId);
+
+            if (mysqli_stmt_execute($stmtUpdate)) {
+                if (mysqli_stmt_affected_rows($stmtUpdate) > 0) {
+                    // 更新成功後跳轉
+                    header("Location: couponList.php");
+                    exit();
+                } else {
+                    $message = '<span style="color: orange;">未更新任何資料，可能是資料未變更。</span>';
+                }
+            } else {
+                $message = '<span style="color: red;">更新失敗：' . mysqli_error($link) . '</span>';
+            }
         }
+        mysqli_stmt_close($stmtCheck);
     } else {
         $message = '<span style="color: red;">請填寫所有欄位！</span>';
     }
@@ -114,7 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .form-container input[type="text"],
         .form-container input[type="number"],
-        .form-container input[type="date"] {
+        .form-container input[type="date"],
+        .form-container select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -171,14 +186,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="code">優惠券代碼</label>
             <input type="text" id="code" name="code" value="<?php echo htmlspecialchars($coupon['code']); ?>" maxlength="20" required>
 
-            <label for="discount">折扣 (%)</label>
-            <input type="number" id="discount" name="discount" value="<?php echo htmlspecialchars($coupon['discount']); ?>" step="0.01" min="0.01" max="100" required>
+            <label for="discount_type">折扣類型</label>
+            <select id="discount_type" name="discount_type" required>
+                <option value="percentage" <?php echo $coupon['discount_type'] === 'percentage' ? 'selected' : ''; ?>>百分比折扣</option>
+                <option value="fixed" <?php echo $coupon['discount_type'] === 'fixed' ? 'selected' : ''; ?>>固定金額折扣</option>
+            </select>
+
+            <label for="discount">折扣值</label>
+            <input type="number" id="discount" name="discount" value="<?php echo htmlspecialchars($coupon['discount']); ?>" step="0.01" min="0.01" required>
 
             <label for="start_date">開始生效日期</label>
             <input type="date" id="start_date" name="start_date" value="<?php echo htmlspecialchars($coupon['start_date']); ?>" min="<?php echo date('Y-m-d'); ?>" required>
 
             <label for="expiration_date">到期日</label>
             <input type="date" id="expiration_date" name="expiration_date" value="<?php echo htmlspecialchars($coupon['expiration_date']); ?>" min="<?php echo date('Y-m-d'); ?>" required>
+
+            <label for="redeem_limit">兌換次數限制</label>
+            <input type="number" id="redeem_limit" name="redeem_limit" value="<?php echo htmlspecialchars($coupon['redeem_limit']); ?>" min="1" required>
 
             <button type="submit">更新優惠券</button>
         </form>
