@@ -1,5 +1,4 @@
 <?php
-// filepath: c:\xampp\htdocs\cart\checkout.php
 require('../db.inc');
 mysqli_set_charset($link, 'utf8');
 session_start();
@@ -36,11 +35,11 @@ if (!isset($_POST['product_id'])) {
 $productId = intval($_POST['product_id']);
 
 // 查詢商品細節
-$sqlProduct = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, p.category, c.quantity, 
-                      a.Name AS seller_name  -- 新增賣家名稱
+$sqlProduct = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, p.category, p.author, p.location, 
+                      c.quantity, a.Name AS seller_name
                FROM products p
                JOIN cart c ON p.id = c.product_id
-               JOIN accounts a ON p.seller_id = a.No  -- 連接賣家帳戶
+               JOIN accounts a ON p.seller_id = a.No
                WHERE c.user_id = ? AND p.id = ?";
 $stmtProduct = mysqli_prepare($link, $sqlProduct);
 mysqli_stmt_bind_param($stmtProduct, 'ii', $userId, $productId);
@@ -95,40 +94,76 @@ if (!$product) {
         .back-link:hover {
             text-decoration: underline;
         }
+        .product-info {
+            margin-bottom: 20px;
+        }
+        .product-info h2, .product-info p {
+            margin: 5px 0;
+        }
+        .payment-method {
+            margin-top: 20px;
+        }
+        .payment-method label {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>結帳</h1>
+
+    <!-- 顯示書名、作者和出貨地 -->
+    <div class="product-info">
+        <h2>書名：<?php echo htmlspecialchars($product['name']); ?></h2>
+        <p>作者：<?php echo htmlspecialchars($product['author']); ?></p>
+        <p>出貨地：<?php echo htmlspecialchars($product['location']); ?></p>
+    </div>
+
     <table>
         <tr>
             <th>圖片</th>
-            <th>商品名稱</th>
             <th>價格</th>
             <th>數量</th>
             <th>小計</th>
             <th>庫存</th>
             <th>描述</th>
-            <th>種類</th> <!-- 新增種類欄位 -->
+            <th>種類</th>
             <th>賣家</th>
         </tr>
         <tr>
             <td>
                 <img src="../product/pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image">
             </td>
-            <td><?php echo htmlspecialchars($product['name']); ?></td>
             <td><?php echo htmlspecialchars($product['price']); ?></td>
             <td><?php echo htmlspecialchars($product['quantity']); ?></td>
             <td><?php echo htmlspecialchars($product['price'] * $product['quantity']); ?></td>
             <td><?php echo htmlspecialchars($product['stock']); ?></td>
             <td><?php echo htmlspecialchars($product['description']); ?></td>
-            <td><?php echo htmlspecialchars($product['category']); ?></td> <!-- 顯示書籍種類 -->
+            <td><?php echo htmlspecialchars($product['category']); ?></td>
             <td><?php echo htmlspecialchars($product['seller_name']); ?></td>
         </tr>
     </table>
 
+    <!-- 新增付款方式 -->
     <form action="checkoutCheck.php" method="POST">
         <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
         <input type="hidden" name="quantity" value="<?php echo $product['quantity']; ?>">
+
+        <div class="payment-method">
+            <h3>選擇付款方式</h3>
+            <label>
+                <input type="radio" name="payment_method" value="credit_card" required> 信用卡
+            </label>
+            <label>
+                <input type="radio" name="payment_method" value="paypal"> PayPal
+            </label>
+            <label>
+                <input type="radio" name="payment_method" value="bank_transfer"> 銀行轉帳
+            </label>
+            <label>
+                <input type="radio" name="payment_method" value="cash_on_delivery"> 貨到付款
+            </label>
+        </div>
+
         <button type="submit" class="checkout-btn">確認結帳</button>
     </form>
     <br>

@@ -15,6 +15,7 @@ if (isset($_SESSION["user"])) {
                 <?php if ($_SESSION["type"] === "Admin"): ?>
                     <li><a href="/admin/userManagement.php">使用者管理</a></li>
                     <li><a href="/admin/productManagement.php">商品管理</a></li>
+                    <li><a href="/admin/orderHistory.php">交易紀錄</a></li>
                     <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
                 <?php endif; ?>
                 <li><a href="/login/logout.php">登出</a></li>
@@ -84,8 +85,8 @@ if (isset($_SESSION["user"])) {
 } else {
     ?>
     <div class="auth-buttons">
-        <a href="/login/register.php" class="auth-button">註冊</a>
-        <a href="/login/login.php" class="auth-button">登入</a>
+        <a href="../login/register.php" class="auth-button">註冊</a>
+        <a href="../login/login.php" class="auth-button">登入</a>
     </div>
     <style>
         .auth-buttons {

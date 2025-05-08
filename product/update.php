@@ -29,16 +29,18 @@ $userId = $user['No'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productId = $_POST['id'];
     $name = $_POST['name'];
+    $author = $_POST['author']; // 書籍作者名稱
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $condition = $_POST['condition'];
     $description = $_POST['description'];
-    $category = $_POST['category']; // 新增接收種類欄位
+    $category = $_POST['category'];
+    $location = $_POST['location']; // 出貨地
 
     // 更新商品資料
-    $sqlUpdate = "UPDATE products SET name = ?, price = ?, stock = ?, `condition` = ?, description = ?, category = ? WHERE id = ? AND seller_id = ?";
+    $sqlUpdate = "UPDATE products SET name = ?, author = ?, price = ?, stock = ?, `condition` = ?, description = ?, category = ?, location = ? WHERE id = ? AND seller_id = ?";
     $stmtUpdate = mysqli_prepare($link, $sqlUpdate);
-    mysqli_stmt_bind_param($stmtUpdate, 'sdisssii', $name, $price, $stock, $condition, $description, $category, $productId, $userId);
+    mysqli_stmt_bind_param($stmtUpdate, 'ssdissssii', $name, $author, $price, $stock, $condition, $description, $category, $location, $productId, $userId);
     mysqli_stmt_execute($stmtUpdate);
 
     // 處理圖片更新

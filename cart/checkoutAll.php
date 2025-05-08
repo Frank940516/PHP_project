@@ -28,7 +28,7 @@ $userId = $user['No'];
 
 // 查詢購物車中的所有商品
 $sqlCart = "SELECT c.product_id, p.name AS product_name, p.price, p.attachment, c.quantity, 
-                   (p.price * c.quantity) AS subtotal, p.stock, p.category
+                   (p.price * c.quantity) AS subtotal, p.stock, p.category, p.author, p.location
             FROM cart c
             JOIN products p ON c.product_id = p.id
             WHERE c.user_id = ?";
@@ -87,50 +87,87 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
         .back-link:hover {
             text-decoration: underline;
         }
+        .product-info {
+            margin-bottom: 20px;
+        }
+        .product-info h2, .product-info p {
+            margin: 5px 0;
+        }
+        .product-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <h1>全部結帳</h1>
+
     <?php if (!empty($cartItems)): ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>圖片</th>
-                    <th>商品名稱</th>
-                    <th>價格</th>
-                    <th>數量</th>
-                    <th>小計</th>
-                    <th>庫存</th>
-                    <th>種類</th> <!-- 新增種類欄位 -->
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($cartItems as $item): ?>
-                    <tr>
-                        <td>
-                            <img src="../product/pic/<?php echo htmlspecialchars($item['attachment']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="product-image">
-                        </td>
-                        <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                        <td><?php echo htmlspecialchars($item['price']); ?></td>
-                        <td><?php echo htmlspecialchars($item['quantity']); ?></td>
-                        <td><?php echo htmlspecialchars($item['subtotal']); ?></td>
-                        <td><?php echo htmlspecialchars($item['stock']); ?></td>
-                        <td><?php echo htmlspecialchars($item['category']); ?></td> <!-- 顯示書籍種類 -->
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5" style="text-align: right;">總金額：</td>
-                    <td colspan="2"><?php echo htmlspecialchars($total); ?></td>
-                </tr>
-            </tfoot>
-        </table>
+        <?php foreach ($cartItems as $item): ?>
+            <div class="product-section">
+                <!-- 顯示書名、作者和出貨地 -->
+                <div class="product-info">
+                    <h2>書名：<?php echo htmlspecialchars($item['product_name']); ?></h2>
+                    <p>作者：<?php echo htmlspecialchars($item['author']); ?></p>
+                    <p>出貨地：<?php echo htmlspecialchars($item['location']); ?></p>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>圖片</th>
+                            <th>價格</th>
+                            <th>數量</th>
+                            <th>小計</th>
+                            <th>庫存</th>
+                            <th>種類</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="../product/pic/<?php echo htmlspecialchars($item['attachment']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="product-image">
+                            </td>
+                            <td><?php echo htmlspecialchars($item['price']); ?></td>
+                            <td><?php echo htmlspecialchars($item['quantity']); ?></td>
+                            <td><?php echo htmlspecialchars($item['subtotal']); ?></td>
+                            <td><?php echo htmlspecialchars($item['stock']); ?></td>
+                            <td><?php echo htmlspecialchars($item['category']); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        <?php endforeach; ?>
+
+        <div style="text-align: right; font-weight: bold; margin-top: 20px;">
+            總金額：<?php echo htmlspecialchars($total); ?>
+        </div>
+
+        <!-- 新增付款方式 -->
         <form action="checkoutCheck.php" method="POST">
             <?php foreach ($cartItems as $index => $item): ?>
                 <input type="hidden" name="products[<?php echo $index; ?>][product_id]" value="<?php echo $item['product_id']; ?>">
                 <input type="hidden" name="products[<?php echo $index; ?>][quantity]" value="<?php echo $item['quantity']; ?>">
             <?php endforeach; ?>
+
+            <div class="payment-method">
+                <h3>選擇付款方式</h3>
+                <label>
+                    <input type="radio" name="payment_method" value="credit_card" required> 信用卡
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="paypal"> PayPal
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="bank_transfer"> 銀行轉帳
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="cash_on_delivery"> 貨到付款
+                </label>
+            </div>
+
             <button type="submit" class="checkout-btn">確認結帳</button>
         </form>
     <?php else: ?>

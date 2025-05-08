@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-05-07 16:06:48
+-- 產生時間： 2025-05-08 07:27:24
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -84,14 +84,6 @@ CREATE TABLE `cart` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- 傾印資料表的資料 `cart`
---
-
-INSERT INTO `cart` (`id`, `user_id`, `product_id`, `quantity`, `created_at`, `updated_at`) VALUES
-(27, 1, 11, 1, '2025-05-06 20:53:54', '2025-05-06 21:12:47'),
-(28, 1, 15, 1, '2025-05-06 20:54:02', '2025-05-06 20:54:02');
-
 -- --------------------------------------------------------
 
 --
@@ -103,27 +95,33 @@ CREATE TABLE `orders` (
   `user_id` int(11) NOT NULL,
   `total_amount` decimal(10,0) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `payment_method` varchar(50) NOT NULL COMMENT '付款方式'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- 傾印資料表的資料 `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `created_at`, `updated_at`) VALUES
-(1, 1, 600, '2025-05-05 08:59:02', '2025-05-05 08:59:02'),
-(2, 1, 661, '2025-05-05 09:19:55', '2025-05-05 09:19:55'),
-(3, 1, 1500, '2025-05-05 09:20:50', '2025-05-05 09:20:50'),
-(4, 1, 900, '2025-05-05 12:44:11', '2025-05-05 12:44:11'),
-(5, 1, 300, '2025-05-05 12:47:14', '2025-05-05 12:47:14'),
-(6, 4, 300, '2025-05-05 13:09:11', '2025-05-05 13:09:11'),
-(7, 4, 24, '2025-05-05 13:09:38', '2025-05-05 13:09:38'),
-(8, 1, 121, '2025-05-05 13:29:03', '2025-05-05 13:29:03'),
-(9, 1, 600, '2025-05-06 11:37:44', '2025-05-06 11:37:44'),
-(10, 6, 500, '2025-05-06 12:38:33', '2025-05-06 12:38:33'),
-(11, 4, 500, '2025-05-06 12:39:33', '2025-05-06 12:39:33'),
-(12, 6, 12, '2025-05-06 12:40:06', '2025-05-06 12:40:06'),
-(13, 1, 300, '2025-05-06 12:53:48', '2025-05-06 12:53:48');
+INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `created_at`, `updated_at`, `payment_method`) VALUES
+(1, 1, 600, '2025-05-05 08:59:02', '2025-05-05 08:59:02', ''),
+(2, 1, 661, '2025-05-05 09:19:55', '2025-05-05 09:19:55', ''),
+(3, 1, 1500, '2025-05-05 09:20:50', '2025-05-05 09:20:50', ''),
+(4, 1, 900, '2025-05-05 12:44:11', '2025-05-05 12:44:11', ''),
+(5, 1, 300, '2025-05-05 12:47:14', '2025-05-05 12:47:14', ''),
+(6, 4, 300, '2025-05-05 13:09:11', '2025-05-05 13:09:11', ''),
+(7, 4, 24, '2025-05-05 13:09:38', '2025-05-05 13:09:38', ''),
+(8, 1, 121, '2025-05-05 13:29:03', '2025-05-05 13:29:03', ''),
+(9, 1, 600, '2025-05-06 11:37:44', '2025-05-06 11:37:44', ''),
+(10, 6, 500, '2025-05-06 12:38:33', '2025-05-06 12:38:33', ''),
+(11, 4, 500, '2025-05-06 12:39:33', '2025-05-06 12:39:33', ''),
+(12, 6, 12, '2025-05-06 12:40:06', '2025-05-06 12:40:06', ''),
+(13, 1, 300, '2025-05-06 12:53:48', '2025-05-06 12:53:48', ''),
+(14, 4, 111, '2025-05-08 02:56:24', '2025-05-08 02:56:24', ''),
+(15, 1, 300, '2025-05-08 03:41:02', '2025-05-08 03:41:02', ''),
+(16, 1, 121, '2025-05-08 03:41:20', '2025-05-08 03:41:20', ''),
+(17, 1, 121, '2025-05-08 03:45:21', '2025-05-08 03:45:21', 'paypal'),
+(18, 1, 121, '2025-05-08 03:49:28', '2025-05-08 03:49:28', 'bank_transfer');
 
 -- --------------------------------------------------------
 
@@ -152,7 +150,12 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`, 
 (8, 6, 11, 1, 300, 300),
 (10, 8, 15, 1, 121, 121),
 (11, 9, 11, 2, 300, 600),
-(15, 13, 11, 1, 300, 300);
+(15, 13, 11, 1, 300, 300),
+(16, 14, 22, 1, 111, 111),
+(17, 15, 11, 1, 300, 300),
+(18, 16, 15, 1, 121, 121),
+(19, 17, 15, 1, 121, 121),
+(20, 18, 15, 1, 121, 121);
 
 -- --------------------------------------------------------
 
@@ -163,10 +166,12 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`, 
 CREATE TABLE `products` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `author` varchar(255) NOT NULL,
   `category` varchar(255) NOT NULL,
   `seller_id` int(11) NOT NULL,
   `condition` enum('全新','九成新','七成新','五成新') NOT NULL,
   `description` text DEFAULT NULL,
+  `location` varchar(255) NOT NULL,
   `attachment` varchar(255) DEFAULT NULL,
   `price` decimal(10,0) NOT NULL,
   `stock` int(11) NOT NULL,
@@ -179,11 +184,12 @@ CREATE TABLE `products` (
 -- 傾印資料表的資料 `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `category`, `seller_id`, `condition`, `description`, `attachment`, `price`, `stock`, `created_at`, `updated_at`, `is_deleted`) VALUES
-(11, 'PHP教科書2', '電腦/資訊', 6, '九成新', '去年買的，有一點小筆跡', '-11.png', 300, 2, '2025-05-04 23:41:25', '2025-05-06 20:53:48', 0),
-(13, 'more books', '文學/小說', 1, '九成新', '前年買的，沒什麼畫過\r\n需要者收，可議價', 'Ayaya-13.png', 150, 3, '2025-05-05 10:39:04', '2025-05-07 21:57:34', 0),
-(15, '1212', '文學/小說', 4, '五成新', 'idk', '1-15.png', 121, 4, '2025-05-05 21:10:53', '2025-05-07 22:06:08', 0),
-(17, 'Java Advanced Textbook', '考試用書/教科書', 1, '九成新', '去年買的', 'Ayaya .w.Ayaya .w.-17.png', 800, 12, '2025-05-06 22:07:52', '2025-05-06 22:07:52', 0);
+INSERT INTO `products` (`id`, `name`, `author`, `category`, `seller_id`, `condition`, `description`, `location`, `attachment`, `price`, `stock`, `created_at`, `updated_at`, `is_deleted`) VALUES
+(11, 'PHP教科書2', '', '電腦/資訊', 6, '九成新', '去年買的，有一點小筆跡', '', '-11.png', 300, 1, '2025-05-04 23:41:25', '2025-05-08 11:41:02', 0),
+(13, 'more books', '', '文學/小說', 1, '九成新', '前年買的，沒什麼畫過\r\n需要者收，可議價', '', 'Ayaya-13.png', 150, 3, '2025-05-05 10:39:04', '2025-05-07 21:57:34', 0),
+(15, '1212', 'test author', '文學/小說', 4, '五成新', 'idk', 'Earth', '1-15.png', 121, 1, '2025-05-05 21:10:53', '2025-05-08 11:49:28', 0),
+(17, 'Java Advanced Textbook', '', '考試用書/教科書', 1, '九成新', '去年買的', '', 'Ayaya .w.Ayaya .w.-17.png', 800, 12, '2025-05-06 22:07:52', '2025-05-06 22:07:52', 0),
+(22, 'test new field', 'new author:)', '漫畫/輕小說', 1, '九成新', '1111', 'Taiwan:)', '1-22.png', 111, 10, '2025-05-07 23:46:58', '2025-05-08 10:56:24', 0);
 
 --
 -- 已傾印資料表的索引
@@ -252,25 +258,25 @@ ALTER TABLE `announcement`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- 已傾印資料表的限制式

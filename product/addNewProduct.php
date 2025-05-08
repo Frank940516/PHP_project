@@ -72,6 +72,9 @@ if (!isset($_SESSION['user'])) {
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" required>
 
+        <label for="author">書籍作者名稱</label>
+        <input type="text" id="author" name="author" required>
+
         <label for="price">價格</label>
         <input type="number" id="price" name="price" step="0.01" required>
 
@@ -108,8 +111,11 @@ if (!isset($_SESSION['user'])) {
         <label for="description">商品描述</label>
         <textarea id="description" name="description" rows="5" required></textarea>
 
+        <label for="location">出貨地</label>
+        <input type="text" id="location" name="location" required>
+
         <label for="attachment">商品圖片</label>
-        <input type="file" id="attachment" name="attachment" accept="image/*"  required>
+        <input type="file" id="attachment" name="attachment" accept="image/*" required>
 
         <button type="submit">新增商品</button>
     </form>

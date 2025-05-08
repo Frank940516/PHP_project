@@ -41,6 +41,14 @@ if (isset($_POST['product_id']) && isset($_POST['quantity'])) {
     exit();
 }
 
+// 檢查是否選擇付款方式
+if (!isset($_POST['payment_method'])) {
+    echo "請選擇付款方式！";
+    exit();
+}
+
+$paymentMethod = $_POST['payment_method']; // 接收付款方式
+
 $totalAmount = 0; // 訂單總金額
 $orderItems = []; // 訂單商品明細
 
@@ -87,9 +95,9 @@ foreach ($products as $productData) {
 }
 
 // 插入訂單記錄
-$sqlInsertOrder = "INSERT INTO orders (user_id, total_amount) VALUES (?, ?)";
+$sqlInsertOrder = "INSERT INTO orders (user_id, total_amount, payment_method) VALUES (?, ?, ?)";
 $stmtInsertOrder = mysqli_prepare($link, $sqlInsertOrder);
-mysqli_stmt_bind_param($stmtInsertOrder, 'id', $userId, $totalAmount);
+mysqli_stmt_bind_param($stmtInsertOrder, 'ids', $userId, $totalAmount, $paymentMethod);
 mysqli_stmt_execute($stmtInsertOrder);
 $orderId = mysqli_insert_id($link);
 

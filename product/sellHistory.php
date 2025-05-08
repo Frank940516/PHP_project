@@ -28,14 +28,14 @@ $userId = $user['No'];
 
 // 查詢販售商品的購買紀錄，按購買時間降序排列
 $sqlSellHistory = "SELECT oi.product_id, p.name AS product_name, p.attachment, p.category, 
-                          o.created_at, o.total_amount, oi.quantity, oi.price, oi.subtotal, 
+                          p.author, o.created_at, o.total_amount, oi.quantity, oi.price, oi.subtotal, 
                           a.No AS buyer_id, a.Name AS buyer_name
                    FROM orders o
                    JOIN order_items oi ON o.id = oi.order_id
                    JOIN products p ON oi.product_id = p.id
                    JOIN accounts a ON o.user_id = a.No
                    WHERE p.seller_id = ?
-                   ORDER BY o.created_at DESC"; // 按購買時間降序排列
+                   ORDER BY o.created_at DESC"; // 新增 p.author 欄位
 $stmtSellHistory = mysqli_prepare($link, $sqlSellHistory);
 mysqli_stmt_bind_param($stmtSellHistory, 'i', $userId);
 mysqli_stmt_execute($stmtSellHistory);
@@ -130,7 +130,10 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
                 <?php $productTotal = 0; // 重置總金額 ?>
                 <?php endif; ?>
                 <div class="product-header">
-                    <div>商品名稱：<a href="detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></div>
+                    <div>商品名稱：<a href="detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link">
+                        <?php echo htmlspecialchars($record['product_name']); ?> 
+                        (作者：<?php echo htmlspecialchars($record['author']); ?>)
+                    </a></div>
                     <div>種類：<?php echo htmlspecialchars($record['category']); ?></div>
                 </div>
                 <table>
