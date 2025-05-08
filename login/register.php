@@ -34,6 +34,7 @@
         }
         .register-form {
             width: 100%;
+            position: relative;
         }
         .register-form label {
             display: block;
@@ -98,6 +99,20 @@
             text-align: center;
             font-size: 1rem;
         }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #1976d2;
+        }
+        .toggle-password:hover {
+            color: #1565c0;
+        }
     </style>
 </head>
 <body>
@@ -118,12 +133,30 @@
             <label for="username">用戶名稱</label>
             <input type="text" id="username" name="username" required>
             <label for="password">密碼</label>
-            <input type="password" id="password" name="password" required>
+            <div style="position: relative;">
+                <input type="password" id="password" name="password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁️</button>
+            </div>
             <label for="confirm_password">確認密碼</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
+            <div style="position: relative;">
+                <input type="password" id="confirm_password" name="confirm_password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('confirm_password', this)">👁️</button>
+            </div>
             <input class="register-btn" type="submit" value="註冊">
         </form>
         <a class="login-link" href="login.php">已經有帳號？登入</a>
     </div>
+    <script>
+        function togglePassword(fieldId, toggleElement) {
+            const passwordField = document.getElementById(fieldId);
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleElement.textContent = '👁️‍🗨️';
+            } else {
+                passwordField.type = 'password';
+                toggleElement.textContent = '👁️';
+            }
+        }
+    </script>
 </body>
 </html>
