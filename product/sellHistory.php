@@ -30,6 +30,7 @@ $userId = $user['No'];
 $sqlSellHistory = "SELECT oi.product_id, p.name AS product_name, p.attachment, p.category, 
                           p.author, o.created_at, o.total_amount, oi.quantity, oi.price, oi.subtotal, 
                           o.coupon_code, o.coupon_discount, o.payment_method, p.location,
+                          (o.total_amount) AS discounted_total, -- 從 orders 表中直接獲取優惠後金額
                           a.No AS buyer_id, a.Name AS buyer_name
                    FROM orders o
                    JOIN order_items oi ON o.id = oi.order_id
@@ -111,7 +112,7 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
         <div class="back-home-button">
             <input type="button" value="返回首頁" onclick="location.href='../index.php'">
         </div>
-        <?php require('../userMenu.php'); ?>
+        <?php include('../userMenu.php'); ?>
     </div>
 
     <h1>販售紀錄</h1>
@@ -153,11 +154,7 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
                             <td>
                                 <img src="../product/pic/<?php echo htmlspecialchars($record['attachment']); ?>" alt="<?php echo htmlspecialchars($record['product_name']); ?>" style="width: 100px; height: auto;">
                             </td>
-                            <td>
-                                <a href="../profile/publicProfile.php?seller_id=<?php echo htmlspecialchars($record['buyer_id']); ?>" class="buyer-link">
-                                    <?php echo htmlspecialchars($record['buyer_name']); ?>
-                                </a>
-                            </td>
+                            <td><?php echo htmlspecialchars($record['buyer_name']); ?></td>
                             <td><?php echo htmlspecialchars($record['location']); ?></td>
                             <td><?php echo htmlspecialchars($record['payment_method']); ?></td>
                             <td><?php echo htmlspecialchars($record['created_at']); ?></td>
@@ -171,15 +168,12 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
                                     無
                                 <?php endif; ?>
                             </td>
-                            <td>
-                                <?php if (!empty($record['coupon_discount'])): ?>
-                                    <?php echo htmlspecialchars($record['subtotal'] - $record['coupon_discount']); ?>
-                                <?php else: ?>
-                                    <?php echo htmlspecialchars($record['subtotal']); ?>
-                                <?php endif; ?>
-                            </td>
+                            <td><?php echo htmlspecialchars($record['discounted_total']); ?></td>
                         </tr>
-                        <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
+                        <?php 
+                        // 累加小計時直接使用 discounted_total
+                        $productTotal += $record['discounted_total']; 
+                        ?>
             <?php if (end($sellRecords) === $record || $currentProductId !== $sellRecords[array_search($record, $sellRecords) + 1]['product_id']): ?>
                     <!-- 顯示最後一個商品的總金額 -->
                     <tr class="total-row">
