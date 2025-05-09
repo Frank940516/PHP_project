@@ -1,6 +1,6 @@
 <?php
 require('../db.inc'); // 資料庫連線檔案
-require('../authCheck.php'); 
+require('../login/authCheck.php'); 
 mysqli_set_charset($link, 'utf8');
 
 // 檢查是否登入
@@ -100,11 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" required>
 
-<<<<<<< HEAD
-        <label for="author">作者</label>
-=======
         <label for="author">書籍作者名稱</label>
->>>>>>> origin/back-end
         <input type="text" id="author" name="author" required>
 
         <label for="price">價格</label>

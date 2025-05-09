@@ -1,6 +1,6 @@
 <?php
 require('../db.inc'); // 資料庫連線檔案
-require('../authCheck.php'); 
+require('../login/authCheck.php'); 
 mysqli_set_charset($link, 'utf8');
 
 // 檢查是否登入
