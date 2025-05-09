@@ -5,7 +5,8 @@ if (isset($_SESSION["user"])) {
         <span class="user-name" onclick="toggleMenu()"><?php echo htmlspecialchars($_SESSION["name"]); ?> ▼</span>
         <div class="menu-dropdown" id="menuDropdown">
             <ul>
-                <li><a href="/profile/profile.php">個人資料</a></li>
+                <li><a href="/profile/profile.php">編輯個人資料</a></li>
+                <li><a href="/coupon/couponList.php">優惠券</a></li>
                 <li><a href="/cart/cart.php">購物車</a></li>
                 <li><a href="/cart/buyHistory.php">購買紀錄</a></li>
                 <li><a href="/product/addNewProduct.php">新增商品</a></li>
@@ -15,6 +16,9 @@ if (isset($_SESSION["user"])) {
                 <?php if ($_SESSION["type"] === "Admin"): ?>
                     <li><a href="/admin/userManagement.php">使用者管理</a></li>
                     <li><a href="/admin/productManagement.php">商品管理</a></li>
+                    <li><a href="/admin/orderHistory.php">交易紀錄</a></li>
+                    <li><a href="../coupon/addCoupon.php">新增優惠券</a></li>
+                    <li><a href="/admin/couponHistory.php">優惠券紀錄</a></li>
                     <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
                 <?php endif; ?>
                 <li><a href="/login/logout.php">登出</a></li>
@@ -84,8 +88,8 @@ if (isset($_SESSION["user"])) {
 } else {
     ?>
     <div class="auth-buttons">
-        <a href="/login/register.php" class="auth-button">註冊</a>
-        <a href="/login/login.php" class="auth-button">登入</a>
+        <a href="../login/register.php" class="auth-button">註冊</a>
+        <a href="../login/login.php" class="auth-button">登入</a>
     </div>
     <style>
         .auth-buttons {

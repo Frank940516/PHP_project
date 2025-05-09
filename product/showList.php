@@ -27,9 +27,9 @@ if (!$user) {
 $userId = $user['No'];
 
 // 查詢使用者上架的商品
-$sqlProducts = "SELECT id, name, price, stock, `condition`, description, attachment, category 
+$sqlProducts = "SELECT id, name, price, stock, `condition`, description, attachment, category, author 
                 FROM products 
-                WHERE seller_id = ? AND is_deleted = 0"; // 新增 category 欄位
+                WHERE seller_id = ? AND is_deleted = 0"; // 新增 author 欄位
 $stmtProducts = mysqli_prepare($link, $sqlProducts);
 mysqli_stmt_bind_param($stmtProducts, 'i', $userId);
 mysqli_stmt_execute($stmtProducts);
@@ -136,7 +136,7 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
                 <th>庫存</th>
                 <th>狀況</th>
                 <th>描述</th>
-                <th>種類</th> <!-- 新增種類欄位 -->
+                <th>種類</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -151,12 +151,15 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
                                 無圖片
                             <?php endif; ?>
                         </td>
-                        <td><?php echo htmlspecialchars($product['name']); ?></td>
+                        <td>
+                            <?php echo htmlspecialchars($product['name']); ?> 
+                            (作者：<?php echo htmlspecialchars($product['author']); ?>)
+                        </td>
                         <td><?php echo htmlspecialchars($product['price']); ?></td>
                         <td><?php echo htmlspecialchars($product['stock']); ?></td>
                         <td><?php echo htmlspecialchars($product['condition']); ?></td>
                         <td><?php echo nl2br(htmlspecialchars($product['description'])); ?></td>
-                        <td><?php echo htmlspecialchars($product['category']); ?></td> <!-- 顯示書籍種類 -->
+                        <td><?php echo htmlspecialchars($product['category']); ?></td>
                         <td class="action-buttons">
                             <a href="edit.php?id=<?php echo $product['id']; ?>">編輯</a>
                             <a href="delete.php?id=<?php echo $product['id']; ?>" class="delete-button" onclick="return confirm('確定要刪除此商品嗎？');">刪除</a>

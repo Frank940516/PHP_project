@@ -29,18 +29,20 @@ $userName = $user['Name'];
 // 處理表單提交
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
+    $author = $_POST['author']; // 書籍作者名稱
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $condition = $_POST['condition'];
     $description = $_POST['description'];
-    $category = $_POST['category']; // 新增書籍種類
+    $category = $_POST['category'];
+    $location = $_POST['location']; // 出貨地
     $attachment = '';
 
     // 插入商品資料（先插入，取得商品 ID）
-    $sqlInsert = "INSERT INTO products (name, price, stock, `condition`, description, category, seller_id) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sqlInsert = "INSERT INTO products (name, author, price, stock, `condition`, description, category, location, seller_id) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtInsert = mysqli_prepare($link, $sqlInsert);
-    mysqli_stmt_bind_param($stmtInsert, 'sdisssi', $name, $price, $stock, $condition, $description, $category, $userId);
+    mysqli_stmt_bind_param($stmtInsert, 'ssdissssi', $name, $author, $price, $stock, $condition, $description, $category, $location, $userId);
     mysqli_stmt_execute($stmtInsert);
 
     if (mysqli_stmt_affected_rows($stmtInsert) > 0) {
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = 'pic/';
             $fileExtension = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
-            $attachmentName = $userName . '-' . $productId . '.' . $fileExtension; // 用戶名稱-商品ID.副檔名
+            $attachmentName = $userId . '-' . $productId . '.' . $fileExtension; // 用戶ID-商品ID.副檔名
             $attachmentPath = $uploadDir . $attachmentName;
 
             // 確保目錄存在

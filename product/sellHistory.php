@@ -28,14 +28,15 @@ $userId = $user['No'];
 
 // 查詢販售商品的購買紀錄，按購買時間降序排列
 $sqlSellHistory = "SELECT oi.product_id, p.name AS product_name, p.attachment, p.category, 
-                          o.created_at, o.total_amount, oi.quantity, oi.price, oi.subtotal, 
+                          p.author, o.created_at, o.total_amount, oi.quantity, oi.price, oi.subtotal, 
+                          o.coupon_code, o.coupon_discount, o.payment_method, p.location,
                           a.No AS buyer_id, a.Name AS buyer_name
                    FROM orders o
                    JOIN order_items oi ON o.id = oi.order_id
                    JOIN products p ON oi.product_id = p.id
                    JOIN accounts a ON o.user_id = a.No
                    WHERE p.seller_id = ?
-                   ORDER BY o.created_at DESC"; // 按購買時間降序排列
+                   ORDER BY o.created_at DESC";
 $stmtSellHistory = mysqli_prepare($link, $sqlSellHistory);
 mysqli_stmt_bind_param($stmtSellHistory, 'i', $userId);
 mysqli_stmt_execute($stmtSellHistory);
@@ -72,6 +73,15 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
             font-size: 14px;
             cursor: pointer;
         }
+        .product-header {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .product-header h2 {
+            margin: 0;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -85,21 +95,9 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
         th {
             background-color: #f2f2f2;
         }
-        .product-header {
-            background-color: #e9ecef;
-            font-weight: bold;
-            padding: 10px;
-        }
-        .product-image {
-            width: 100px;
-            height: auto;
-        }
-        .product-link, .buyer-link {
-            text-decoration: none;
-            color: #007BFF;
-        }
-        .product-link:hover, .buyer-link:hover {
-            text-decoration: underline;
+        .coupon-info {
+            font-size: 14px;
+            color: #28a745;
         }
         .total-row {
             font-weight: bold;
@@ -130,18 +128,22 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
                 <?php $productTotal = 0; // 重置總金額 ?>
                 <?php endif; ?>
                 <div class="product-header">
-                    <div>商品名稱：<a href="detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></div>
-                    <div>種類：<?php echo htmlspecialchars($record['category']); ?></div>
+                    <h2>商品名稱：<?php echo htmlspecialchars($record['product_name']); ?> (作者：<?php echo htmlspecialchars($record['author']); ?>)</h2>
+                    <p>種類：<?php echo htmlspecialchars($record['category']); ?></p>
                 </div>
                 <table>
                     <thead>
                         <tr>
                             <th>圖片</th>
-                            <th>購買者</th>
+                            <th>買家</th>
+                            <th>出貨地</th>
+                            <th>付款方式</th>
                             <th>購買時間</th>
                             <th>數量</th>
                             <th>單價</th>
                             <th>小計</th>
+                            <th>優惠券</th>
+                            <th>優惠後金額</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -149,23 +151,39 @@ while ($row = mysqli_fetch_assoc($resultSellHistory)) {
             <?php endif; ?>
                         <tr>
                             <td>
-                                <img src="../product/pic/<?php echo htmlspecialchars($record['attachment']); ?>" alt="<?php echo htmlspecialchars($record['product_name']); ?>" class="product-image">
+                                <img src="../product/pic/<?php echo htmlspecialchars($record['attachment']); ?>" alt="<?php echo htmlspecialchars($record['product_name']); ?>" style="width: 100px; height: auto;">
                             </td>
                             <td>
                                 <a href="../profile/publicProfile.php?seller_id=<?php echo htmlspecialchars($record['buyer_id']); ?>" class="buyer-link">
                                     <?php echo htmlspecialchars($record['buyer_name']); ?>
                                 </a>
                             </td>
+                            <td><?php echo htmlspecialchars($record['location']); ?></td>
+                            <td><?php echo htmlspecialchars($record['payment_method']); ?></td>
                             <td><?php echo htmlspecialchars($record['created_at']); ?></td>
                             <td><?php echo htmlspecialchars($record['quantity']); ?></td>
                             <td><?php echo htmlspecialchars($record['price']); ?></td>
                             <td><?php echo htmlspecialchars($record['subtotal']); ?></td>
+                            <td>
+                                <?php if (!empty($record['coupon_code'])): ?>
+                                    <span class="coupon-info"><?php echo htmlspecialchars($record['coupon_code']); ?></span>
+                                <?php else: ?>
+                                    無
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if (!empty($record['coupon_discount'])): ?>
+                                    <?php echo htmlspecialchars($record['subtotal'] - $record['coupon_discount']); ?>
+                                <?php else: ?>
+                                    <?php echo htmlspecialchars($record['subtotal']); ?>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
             <?php if (end($sellRecords) === $record || $currentProductId !== $sellRecords[array_search($record, $sellRecords) + 1]['product_id']): ?>
                     <!-- 顯示最後一個商品的總金額 -->
                     <tr class="total-row">
-                        <td colspan="5">總金額：</td>
+                        <td colspan="9">總金額：</td>
                         <td><?php echo htmlspecialchars($productTotal); ?></td>
                     </tr>
                     </tbody>

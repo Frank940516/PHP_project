@@ -27,9 +27,10 @@ if (!$user) {
 $userId = $user['No'];
 
 // 查詢購買紀錄
-$sqlHistory = "SELECT o.id AS order_id, o.total_amount, o.created_at, 
+$sqlHistory = "SELECT o.id AS order_id, o.total_amount, o.created_at, o.payment_method, 
+                      o.coupon_code, o.coupon_discount, -- 新增優惠券相關欄位
                       oi.product_id, p.name AS product_name, p.attachment, p.is_deleted, 
-                      oi.quantity, oi.price, oi.subtotal, p.category, -- 新增 category 欄位
+                      oi.quantity, oi.price, oi.subtotal, p.category, p.author, p.location, 
                       a.No AS seller_id, a.Name AS seller_name
                FROM orders o
                JOIN order_items oi ON o.id = oi.order_id
@@ -111,6 +112,10 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
             text-align: right;
             background-color: #f9f9f9;
         }
+        .coupon-info {
+            font-size: 14px;
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -134,7 +139,10 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                 <?php $productTotal = 0; // 重置總金額 ?>
                 <?php endif; ?>
                 <div class="product-header">
-                    <div>商品名稱：<a href="../product/detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link"><?php echo htmlspecialchars($record['product_name']); ?></a></div>
+                    <div>商品名稱：<a href="../product/detail.php?id=<?php echo htmlspecialchars($record['product_id']); ?>" class="product-link">
+                        <?php echo htmlspecialchars($record['product_name']); ?> 
+                        (作者：<?php echo htmlspecialchars($record['author']); ?>) <!-- 顯示作者 -->
+                    </a></div>
                     <div>種類：<?php echo htmlspecialchars($record['category']); ?></div>
                 </div>
                 <table>
@@ -142,6 +150,8 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                         <tr>
                             <th>圖片</th>
                             <th>賣家</th>
+                            <th>出貨地</th>
+                            <th>付款方式</th> <!-- 新增付款方式欄位 -->
                             <th>購買時間</th>
                             <th>數量</th>
                             <th>單價</th>
@@ -160,6 +170,8 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                                     <?php echo htmlspecialchars($record['seller_name']); ?>
                                 </a>
                             </td>
+                            <td><?php echo htmlspecialchars($record['location']); ?></td>
+                            <td><?php echo htmlspecialchars($record['payment_method']); ?></td> <!-- 顯示付款方式 -->
                             <td><?php echo htmlspecialchars($record['created_at']); ?></td>
                             <td><?php echo htmlspecialchars($record['quantity']); ?></td>
                             <td><?php echo htmlspecialchars($record['price']); ?></td>
@@ -168,8 +180,15 @@ while ($row = mysqli_fetch_assoc($resultHistory)) {
                         <?php $productTotal += $record['subtotal']; // 累加小計到總金額 ?>
             <?php if (end($buyRecords) === $record || $currentProductId !== $buyRecords[array_search($record, $buyRecords) + 1]['product_id']): ?>
                     <tr class="total-row">
-                        <td colspan="5">總金額：</td>
-                        <td><?php echo htmlspecialchars($productTotal); ?></td>
+                        <td colspan="6">
+                            <?php if (!empty($record['coupon_code'])): ?>
+                                <div class="coupon-info">
+                                    使用優惠券：<?php echo htmlspecialchars($record['coupon_code']); ?>，折扣金額：<?php echo htmlspecialchars($record['coupon_discount']); ?>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <td>總金額：</td>
+                        <td><?php echo htmlspecialchars($record['total_amount']); ?></td>
                     </tr>
                     </tbody>
                 </table>

@@ -100,7 +100,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" required>
 
+<<<<<<< HEAD
         <label for="author">作者</label>
+=======
+        <label for="author">書籍作者名稱</label>
+>>>>>>> origin/back-end
         <input type="text" id="author" name="author" required>
 
         <label for="price">價格</label>
@@ -138,6 +142,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <label for="description">商品描述</label>
         <textarea id="description" name="description" rows="5" required></textarea>
+
+        <label for="location">出貨地</label>
+        <input type="text" id="location" name="location" required>
 
         <label for="attachment">商品圖片</label>
         <input type="file" id="attachment" name="attachment" accept="image/*" required>

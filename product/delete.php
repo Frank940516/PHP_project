@@ -56,19 +56,33 @@ if (!$product) {
     exit();
 }
 
-// 標記商品為已刪除
-$sqlMarkDeleted = "UPDATE products SET is_deleted = 1 WHERE id = ?";
-$stmtMarkDeleted = mysqli_prepare($link, $sqlMarkDeleted);
-mysqli_stmt_bind_param($stmtMarkDeleted, 'i', $productId);
-mysqli_stmt_execute($stmtMarkDeleted);
+// 刪除與商品相關的 order_items 記錄
+$sqlDeleteOrderItems = "DELETE FROM order_items WHERE product_id = ?";
+$stmtDeleteOrderItems = mysqli_prepare($link, $sqlDeleteOrderItems);
+mysqli_stmt_bind_param($stmtDeleteOrderItems, 'i', $productId);
+mysqli_stmt_execute($stmtDeleteOrderItems);
 
-if (mysqli_stmt_affected_rows($stmtMarkDeleted) > 0) {
+// 刪除商品附件檔案
+if (!empty($product['attachment'])) {
+    $filePath = "pic/" . $product['attachment'];
+    if (file_exists($filePath)) {
+        unlink($filePath); // 刪除檔案
+    }
+}
+
+// 從資料庫中刪除商品
+$sqlDeleteProduct = "DELETE FROM products WHERE id = ?";
+$stmtDeleteProduct = mysqli_prepare($link, $sqlDeleteProduct);
+mysqli_stmt_bind_param($stmtDeleteProduct, 'i', $productId);
+mysqli_stmt_execute($stmtDeleteProduct);
+
+if (mysqli_stmt_affected_rows($stmtDeleteProduct) > 0) {
     if ($userType === 'Admin') {
-        echo "<script>alert('商品已成功移除！'); location.href='../admin/productManagement.php';</script>";
+        echo "<script>alert('商品已成功刪除！'); location.href='../admin/productManagement.php';</script>";
     } else {
-        echo "<script>alert('商品已成功移除！'); location.href='showList.php';</script>";
+        echo "<script>alert('商品已成功刪除！'); location.href='showList.php';</script>";
     }
 } else {
-    echo "<script>alert('商品移除失敗！'); history.back();</script>";
+    echo "<script>alert('商品刪除失敗！'); history.back();</script>";
 }
 ?>

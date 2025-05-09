@@ -38,12 +38,12 @@ $productId = $_GET['id'];
 // 查詢商品資料
 if ($userType === 'Admin') {
     // 管理員可以編輯所有商品
-    $sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category FROM products WHERE id = ?";
+    $sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category, author, location FROM products WHERE id = ?";
     $stmtProduct = mysqli_prepare($link, $sqlProduct);
     mysqli_stmt_bind_param($stmtProduct, 'i', $productId);
 } else {
     // 一般使用者只能編輯自己的商品
-    $sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category FROM products WHERE id = ? AND seller_id = ?";
+    $sqlProduct = "SELECT id, name, price, stock, `condition`, description, attachment, category, author, location FROM products WHERE id = ? AND seller_id = ?";
     $stmtProduct = mysqli_prepare($link, $sqlProduct);
     mysqli_stmt_bind_param($stmtProduct, 'ii', $productId, $userId);
 }
@@ -60,18 +60,21 @@ if (!$product) {
 // 如果是 POST 請求，處理表單提交
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
+    $author = $_POST['author'];
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $condition = $_POST['condition'];
     $category = $_POST['category'];
     $description = $_POST['description'];
+    $location = $_POST['location'];
 
     // 處理圖片上傳
     $attachment = $product['attachment']; // 預設為原本的圖片
     if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = '../product/pic/';
-        $fileName = basename($_FILES['attachment']['name']);
-        $targetFilePath = $uploadDir . $fileName;
+        $fileExtension = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
+        $attachmentName = $userId . '-' . $productId . '.' . $fileExtension; // 用戶ID-商品ID.副檔名
+        $targetFilePath = $uploadDir . $attachmentName;
 
         // 確保目錄存在
         if (!is_dir($uploadDir)) {
@@ -80,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 移動上傳的檔案
         if (move_uploaded_file($_FILES['attachment']['tmp_name'], $targetFilePath)) {
-            $attachment = $fileName; // 更新圖片名稱
+            $attachment = $attachmentName; // 更新圖片名稱
         } else {
             echo "圖片上傳失敗！";
             exit();
@@ -88,16 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 更新商品資料
-    $sqlUpdate = "UPDATE products SET name = ?, price = ?, stock = ?, `condition` = ?, category = ?, description = ?, attachment = ? WHERE id = ?";
+    $sqlUpdate = "UPDATE products SET name = ?, author = ?, price = ?, stock = ?, `condition` = ?, category = ?, description = ?, location = ?, attachment = ? WHERE id = ?";
     $stmtUpdate = mysqli_prepare($link, $sqlUpdate);
-    mysqli_stmt_bind_param($stmtUpdate, 'siissssi', $name, $price, $stock, $condition, $category, $description, $attachment, $productId);
+    mysqli_stmt_bind_param($stmtUpdate, 'ssiisssssi', $name, $author, $price, $stock, $condition, $category, $description, $location, $attachment, $productId);
     mysqli_stmt_execute($stmtUpdate);
 
-    // 如果是管理員，導回商品管理頁面
-    if ($userType === 'Admin') {
-        header("Location: ../admin/productManagement.php");
-        exit();
-    }
 
     // 如果是一般使用者，導回商品列表頁面
     header("Location: showList.php");
@@ -172,6 +170,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
 
+        <label for="author">書籍作者名稱</label>
+        <input type="text" id="author" name="author" value="<?php echo htmlspecialchars($product['author']); ?>" required>
+
         <label for="price">價格</label>
         <input type="number" id="price" name="price" step="1" min="1" value="<?php echo htmlspecialchars($product['price']); ?>" required>
 
@@ -207,6 +208,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <label for="description">商品描述</label>
         <textarea id="description" name="description" rows="5" required><?php echo htmlspecialchars($product['description']); ?></textarea>
+
+        <label for="location">出貨地</label>
+        <input type="text" id="location" name="location" value="<?php echo htmlspecialchars($product['location']); ?>" required>
 
         <label for="attachment">商品圖片</label>
         <?php if (!empty($product['attachment'])): ?>

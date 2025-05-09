@@ -155,6 +155,7 @@ $currentDate = null;
                                 <th>價格</th>
                                 <th>描述</th>
                                 <th>賣家名稱</th>
+                                <th>出貨地</th> <!-- 新增出貨地欄位 -->
                                 <th>庫存</th>
                                 <th>情況</th>
                                 <th>建立時間</th>
@@ -167,7 +168,10 @@ $currentDate = null;
             endif;
             ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                <td>
+                                    <?php echo htmlspecialchars($row['name']); ?> 
+                                    (作者：<?php echo htmlspecialchars($row['author']); ?>) <!-- 顯示作者 -->
+                                </td>
                                 <td><?php echo htmlspecialchars(number_format($row['price'], 0)); ?></td>
                                 <td><?php echo nl2br(htmlspecialchars($row['description'])); ?></td>
                                 <td>
@@ -175,6 +179,7 @@ $currentDate = null;
                                         <?php echo htmlspecialchars($row['seller_name']); ?>
                                     </a>
                                 </td>
+                                <td><?php echo htmlspecialchars($row['location']); ?></td> <!-- 顯示出貨地 -->
                                 <td><?php echo htmlspecialchars($row['stock']); ?></td>
                                 <td><?php echo htmlspecialchars($row['condition']); ?></td>
                                 <td><?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($row['created_at']))); ?></td>

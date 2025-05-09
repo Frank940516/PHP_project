@@ -12,7 +12,9 @@ if (!isset($_GET['id'])) {
 $productId = $_GET['id'];
 
 // 查詢商品詳細資訊
-$sql = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, p.seller_id, a.Name AS seller_name 
+$sql = "SELECT p.id, p.name, p.price, p.stock, p.description, p.attachment, p.seller_id, 
+               p.author, p.location, p.created_at, p.updated_at, 
+               a.Name AS seller_name 
         FROM products p 
         JOIN accounts a ON p.seller_id = a.No 
         WHERE p.id = ?";
@@ -123,6 +125,12 @@ if (isset($_SESSION['user'])) {
                 color: #555;
                 margin-bottom: 10px;
             }
+            .product-info .additional-info {
+                font-size: 14px;
+                color: #555;
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
             .product-info .quantity {
                 display: flex;
                 align-items: center;
@@ -160,6 +168,7 @@ if (isset($_SESSION['user'])) {
                 </div>
                 <div class="product-info">
                     <h1><?php echo htmlspecialchars($product['name']); ?></h1>
+                    <p class="author">作者：<?php echo htmlspecialchars($product['author']); ?></p>
                     <p class="price">價格：$<?php echo htmlspecialchars($product['price']); ?></p>
                     <p class="stock <?php echo $product['stock'] == 0 ? 'sold-out' : ''; ?>">
                         <?php echo $product['stock'] == 0 ? '售完' : '庫存：' . htmlspecialchars($product['stock']) . ' 件'; ?>
@@ -170,6 +179,11 @@ if (isset($_SESSION['user'])) {
                         </a>
                     </p>
                     <p class="description"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+                    <p class="additional-info">
+                        出貨地：<?php echo htmlspecialchars($product['location']); ?><br>
+                        創建日期：<?php echo htmlspecialchars($product['created_at']); ?><br>
+                        更新日期：<?php echo htmlspecialchars($product['updated_at']); ?>
+                    </p>
                     <?php if ($userId): ?>
                         <?php if ($product['seller_id'] == $userId): ?>
                             <!-- 如果是自己的商品，顯示編輯按鈕 -->
