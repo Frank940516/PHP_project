@@ -43,6 +43,21 @@ $result = mysqli_stmt_get_result($stmt);
 if (!$result) {
     die("查詢失敗：" . mysqli_error($link));
 }
+
+// 查詢優惠券使用紀錄
+$sqlUsage = "SELECT o.created_at AS used_time, a.Name AS user_name 
+             FROM orders o
+             JOIN accounts a ON o.user_id = a.No
+             WHERE o.coupon_code = (SELECT code FROM coupons WHERE id = ?)
+             ORDER BY o.created_at ASC";
+$stmtUsage = mysqli_prepare($link, $sqlUsage);
+mysqli_stmt_bind_param($stmtUsage, 'i', $couponId);
+mysqli_stmt_execute($stmtUsage);
+$resultUsage = mysqli_stmt_get_result($stmtUsage);
+
+if (!$resultUsage) {
+    die("查詢失敗：" . mysqli_error($link));
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -115,6 +130,29 @@ if (!$result) {
         </table>
     <?php else: ?>
         <p>目前沒有兌換紀錄。</p>
+    <?php endif; ?>
+
+    <h1>使用紀錄</h1>
+
+    <?php if (mysqli_num_rows($resultUsage) > 0): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>使用者</th>
+                    <th>使用時間</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($rowUsage = mysqli_fetch_assoc($resultUsage)): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($rowUsage['user_name']); ?></td>
+                        <td><?php echo htmlspecialchars($rowUsage['used_time']); ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>目前沒有使用紀錄。</p>
     <?php endif; ?>
 
     <?php mysqli_close($link); ?>

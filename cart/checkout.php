@@ -100,44 +100,70 @@ if ($selectedCoupon !== '') {
     <meta charset="UTF-8">
     <title>結帳</title>
     <style>
-        /* 省略樣式，沿用原本 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: red;
+        }
+        .discounted-price {
+            color: green;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <h1>結帳</h1>
 
-    <div class="product-info">
-        <h2>書名：<?php echo htmlspecialchars($product['name']); ?></h2>
-        <p>作者：<?php echo htmlspecialchars($product['author']); ?></p>
-        <p>出貨地：<?php echo htmlspecialchars($product['location']); ?></p>
-    </div>
-
     <table>
-        <tr>
-            <th>圖片</th><th>價格</th><th>數量</th><th>小計</th>
-            <th>庫存</th><th>描述</th><th>種類</th><th>賣家</th>
-        </tr>
-        <tr>
-            <td>
-                <img src="../product/pic/<?php echo htmlspecialchars($product['attachment']); ?>"
-                     alt="<?php echo htmlspecialchars($product['name']); ?>"
-                     class="product-image">
-            </td>
-            <td>
-                <?php if ($discountedPrice !== null): ?>
-                    <span class="original-price"><?php echo htmlspecialchars($product['price'] * $product['quantity']); ?></span>
-                    <span class="discounted-price"><?php echo $discountedPrice; ?></span>
-                <?php else: ?>
-                    <?php echo htmlspecialchars($product['price'] * $product['quantity']); ?>
-                <?php endif; ?>
-            </td>
-            <td><?php echo htmlspecialchars($product['quantity']); ?></td>
-            <td><?php echo $discountedPrice !== null ? $discountedPrice : $product['price'] * $product['quantity']; ?></td>
-            <td><?php echo htmlspecialchars($product['stock']); ?></td>
-            <td><?php echo htmlspecialchars($product['description']); ?></td>
-            <td><?php echo htmlspecialchars($product['category']); ?></td>
-            <td><?php echo htmlspecialchars($product['seller_name']); ?></td>
-        </tr>
+        <thead>
+            <tr>
+                <th>圖片</th>
+                <th>書名</th>
+                <th>價格</th>
+                <th>數量</th>
+                <th>小計</th>
+                <th>庫存</th>
+                <th>描述</th>
+                <th>種類</th>
+                <th>賣家</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <img src="../product/pic/<?php echo htmlspecialchars($product['attachment']); ?>"
+                         alt="<?php echo htmlspecialchars($product['name']); ?>"
+                         style="width: 100px; height: auto;">
+                </td>
+                <td><?php echo htmlspecialchars($product['name']); ?></td>
+                <td>
+                    <?php if ($discountedPrice !== null): ?>
+                        <span class="original-price"><?php echo htmlspecialchars($product['price']); ?></span>
+                        <span class="discounted-price"><?php echo $discountedPrice; ?></span>
+                    <?php else: ?>
+                        <?php echo htmlspecialchars($product['price']); ?>
+                    <?php endif; ?>
+                </td>
+                <td><?php echo htmlspecialchars($product['quantity']); ?></td>
+                <td><?php echo $discountedPrice !== null ? $discountedPrice : $product['price'] * $product['quantity']; ?></td>
+                <td><?php echo htmlspecialchars($product['stock']); ?></td>
+                <td><?php echo htmlspecialchars($product['description']); ?></td>
+                <td><?php echo htmlspecialchars($product['category']); ?></td>
+                <td><?php echo htmlspecialchars($product['seller_name']); ?></td>
+            </tr>
+        </tbody>
     </table>
 
     <!-- 優惠券選擇 -->
@@ -151,7 +177,7 @@ if ($selectedCoupon !== '') {
                     <?php echo $selectedCoupon === $coupon['code'] ? 'selected' : ''; ?>>
                     <?php echo htmlspecialchars($coupon['code']); ?> -
                     <?php echo $coupon['discount_type'] === 'percentage'
-                        ? htmlspecialchars($coupon['discount']) . '% 折扣'
+                        ? htmlspecialchars($coupon['discount']) . '% 折扣' 
                         : '$' . htmlspecialchars($coupon['discount']) . ' 折扣'; ?>
                 </option>
             <?php endforeach; ?>

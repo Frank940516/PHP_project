@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-05-08 18:31:21
+-- 產生時間： 2025-05-09 06:45:35
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -89,7 +89,7 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`id`, `user_id`, `product_id`, `quantity`, `created_at`, `updated_at`) VALUES
-(37, 4, 22, 1, '2025-05-08 23:39:12', '2025-05-08 23:39:12');
+(38, 1, 15, 1, '2025-05-09 10:18:17', '2025-05-09 10:18:17');
 
 -- --------------------------------------------------------
 
@@ -115,12 +115,13 @@ CREATE TABLE `coupons` (
 
 INSERT INTO `coupons` (`id`, `code`, `discount`, `expiration_date`, `is_active`, `start_date`, `discount_type`, `redeem_limit`, `redeem_count`) VALUES
 (1, 'WELCOME10', 10.00, '2025-12-31', 2, '2025-05-14', 'percentage', 1, 0),
-(2, 'SUMMER20', 20.00, '2025-08-31', 1, '2025-05-08', 'percentage', 1, 0),
+(2, 'SUMMER20', 20.00, '2025-08-31', 0, '2025-05-08', 'percentage', 1, 1),
 (3, 'BLACKFRIDAY50', 25.00, '2025-11-29', 1, '2025-05-08', 'percentage', 10, 1),
 (4, 'EXPIRED5', 5.00, '2024-12-31', 0, '2025-05-08', 'percentage', 1, 1),
 (7, 'LIMITED', 10.00, '2025-05-08', 0, '2025-05-08', 'percentage', 2, 2),
-(8, '!', 100.00, '2025-05-09', 2, '2025-05-09', 'fixed', 1, 0),
-(11, 'test%&$', 100.00, '2025-06-04', 1, '2025-05-08', 'fixed', 5, 2);
+(8, '!', 100.00, '2025-05-09', 1, '2025-05-09', 'fixed', 1, 0),
+(11, 'test%&$', 100.00, '2025-06-04', 1, '2025-05-08', 'fixed', 5, 2),
+(12, 'testCOUPON', 100.00, '2025-05-10', 0, '2025-05-09', 'percentage', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -166,7 +167,10 @@ INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `created_at`, `updated_at
 (20, 4, 111, '2025-05-08 15:03:47', '2025-05-08 15:03:47', 'credit_card', NULL, 0.00),
 (21, 4, 800, '2025-05-08 15:10:25', '2025-05-08 15:10:25', 'paypal', NULL, 0.00),
 (22, 4, 150, '2025-05-08 15:19:17', '2025-05-08 15:19:17', 'bank_transfer', NULL, 0.00),
-(23, 4, 600, '2025-05-08 15:35:20', '2025-05-08 15:35:20', 'bank_transfer', 'BLACKFRIDAY50', 200.00);
+(23, 4, 600, '2025-05-08 15:35:20', '2025-05-08 15:35:20', 'bank_transfer', 'BLACKFRIDAY50', 200.00),
+(24, 4, 1650, '2025-05-09 03:29:49', '2025-05-09 03:29:49', 'bank_transfer', 'test%&$', 100.00),
+(25, 4, 89, '2025-05-09 03:40:48', '2025-05-09 03:40:48', 'paypal', 'SUMMER20', 22.20),
+(26, 4, 0, '2025-05-09 04:44:15', '2025-05-09 04:44:15', 'cash_on_delivery', 'testCOUPON', 150.00);
 
 -- --------------------------------------------------------
 
@@ -205,7 +209,12 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`, 
 (22, 20, 22, 1, 111, 111),
 (23, 21, 17, 1, 800, 800),
 (24, 22, 13, 1, 150, 150),
-(25, 23, 17, 1, 800, 800);
+(25, 23, 17, 1, 800, 800),
+(26, 24, 17, 1, 800, 800),
+(27, 24, 13, 1, 150, 150),
+(28, 24, 17, 1, 800, 800),
+(29, 25, 22, 1, 111, 111),
+(30, 26, 13, 1, 150, 150);
 
 -- --------------------------------------------------------
 
@@ -236,10 +245,10 @@ CREATE TABLE `products` (
 
 INSERT INTO `products` (`id`, `name`, `author`, `category`, `seller_id`, `condition`, `description`, `location`, `attachment`, `price`, `stock`, `created_at`, `updated_at`, `is_deleted`) VALUES
 (11, 'PHP教科書2', '', '電腦/資訊', 6, '九成新', '去年買的，有一點小筆跡', '', '-11.png', 300, 1, '2025-05-04 23:41:25', '2025-05-08 11:41:02', 0),
-(13, 'more books', '', '文學/小說', 1, '九成新', '前年買的，沒什麼畫過\r\n需要者收，可議價', '', 'Ayaya-13.png', 150, 2, '2025-05-05 10:39:04', '2025-05-08 23:19:17', 0),
-(15, '1212', 'test author', '文學/小說', 4, '五成新', 'idk', 'Earth', '1-15.png', 121, 1, '2025-05-05 21:10:53', '2025-05-08 11:49:28', 0),
-(17, 'Java Advanced Textbook', '', '考試用書/教科書', 1, '九成新', '去年買的', '', 'Ayaya .w.Ayaya .w.-17.png', 800, 10, '2025-05-06 22:07:52', '2025-05-08 23:35:20', 0),
-(22, 'test new field', 'new author:)', '漫畫/輕小說', 1, '九成新', '1111', 'Taiwan:)', '1-22.png', 111, 8, '2025-05-07 23:46:58', '2025-05-08 23:03:47', 0);
+(13, 'more books', '123', '文學/小說', 1, '九成新', '前年買的，沒什麼畫過\r\n需要者收，可議價', '123', 'Ayaya-13.png', 150, 18, '2025-05-05 10:39:04', '2025-05-09 12:44:15', 0),
+(15, '1212', 'test author', '文學/小說', 4, '五成新', 'idk', 'Earth', '1-15.png', 121, 10, '2025-05-05 21:10:53', '2025-05-09 10:18:07', 0),
+(17, 'Java Advanced Textbook', '', '考試用書/教科書', 1, '九成新', '去年買的', '', 'Ayaya .w.Ayaya .w.-17.png', 800, 8, '2025-05-06 22:07:52', '2025-05-09 11:29:49', 0),
+(22, 'test new field', 'new author:)', '漫畫/輕小說', 1, '九成新', '1111', 'Taiwan:)', '1-22.png', 111, 7, '2025-05-07 23:46:58', '2025-05-09 11:40:48', 0);
 
 -- --------------------------------------------------------
 
@@ -260,8 +269,10 @@ CREATE TABLE `user_coupons` (
 --
 
 INSERT INTO `user_coupons` (`id`, `user_id`, `coupon_id`, `redeem_time`, `is_used`) VALUES
-(5, 4, 11, '2025-05-08 21:23:27', 0),
-(6, 4, 3, '2025-05-08 21:25:49', 1);
+(5, 4, 11, '2025-05-08 21:23:27', 1),
+(6, 4, 3, '2025-05-08 21:25:49', 1),
+(7, 4, 2, '2025-05-09 11:35:44', 1),
+(8, 4, 12, '2025-05-09 12:44:02', 1);
 
 --
 -- 已傾印資料表的索引
@@ -345,25 +356,25 @@ ALTER TABLE `announcement`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `coupons`
 --
 ALTER TABLE `coupons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
@@ -375,7 +386,7 @@ ALTER TABLE `products`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `user_coupons`
 --
 ALTER TABLE `user_coupons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- 已傾印資料表的限制式

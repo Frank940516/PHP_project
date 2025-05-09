@@ -219,9 +219,6 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
             <td colspan="7" class="total">總金額：</td>
             <td colspan="3" class="total-cell">
                 <?php echo $total; ?>
-                <form action="checkoutAll.php" method="POST" style="display: inline;">
-                    <button type="submit" class="checkout-btn">全部結帳</button>
-                </form>
             </td>
         </tr>
     </tfoot>
@@ -305,9 +302,6 @@ while ($row = mysqli_fetch_assoc($resultCart)) {
         if (totalCell) {
             totalCell.innerHTML = `
                 ${total} <!-- 不進行格式化，直接顯示數據 -->
-                <form action="checkoutAll.php" method="POST" style="display: inline;">
-                    <button type="submit" class="checkout-btn">全部結帳</button>
-                </form>
             `;
         }
     }
