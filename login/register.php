@@ -1,6 +1,10 @@
 <?php
     require('../db.inc');
     mysqli_set_charset($link, 'utf8');
+    session_start();
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
 ?>
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -128,18 +132,19 @@
         }
         ?>
         <form class="register-form" action="registerCheck.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <label for="email">郵件</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" maxlength="255" required>
             <label for="username">用戶名稱</label>
             <input type="text" id="name" name="name" required>
             <label for="password">密碼</label>
             <div style="position: relative;">
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" maxlength="128" required>
                 <button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁️</button>
             </div>
             <label for="confirm_password">確認密碼</label>
             <div style="position: relative;">
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <input type="password" id="confirm_password" name="confirm_password" maxlength="128" required>
                 <button type="button" class="toggle-password" onclick="togglePassword('confirm_password', this)">👁️</button>
             </div>
             <input class="register-btn" type="submit" value="註冊">
