@@ -1,6 +1,10 @@
 <?php
     require('../db.inc');
     mysqli_set_charset($link, 'utf8');
+    session_start();
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
 ?>
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -123,6 +127,7 @@
         }
         ?>
         <form class="login-form" action="loginCheck.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <input type="hidden" name="redirect" value="<?php echo isset($_GET['redirect']) ? htmlspecialchars($_GET['redirect']) : '../index.php'; ?>">
             <label for="email">郵件</label>
             <input type="text" id="email" name="email" required>
