@@ -6,13 +6,14 @@ if (isset($_SESSION["user"])) {
         <div class="menu-dropdown" id="menuDropdown">
             <ul>
                 <li><a href="/php_project/profile/profile.php">編輯個人資料</a></li>
+                <li><a href="/php_project/notification/notification.php">通知</a></li>
+                <li><a href="/php_project/notification/wishList.php">願望清單</a></li>
                 <li><a href="/php_project/coupon/couponList.php">優惠券</a></li>
                 <li><a href="/php_project/cart/cart.php">購物車</a></li>
                 <li><a href="/php_project/cart/buyHistory.php">購買紀錄</a></li>
                 <li><a href="/php_project/product/addNewProduct.php">新增商品</a></li>
                 <li><a href="/php_project/product/showList.php">管理訂單</a></li>
                 <li><a href="/php_project/product/sellHistory.php">訂單紀錄</a></li>
-                <li><a href="/php_project/product/wishlist.php">願望清單</a></li>
                 <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
                 <?php if (isset($_SESSION["type"]) && $_SESSION["type"] === "Admin"): ?>                    <li><a href="/php_project/admin/userManagement.php">使用者管理</a></li>
                     <li><a href="/php_project/admin/productManagement.php">商品管理</a></li>
