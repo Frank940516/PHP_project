@@ -10,6 +10,25 @@
         "童書/繪本", "漫畫/輕小說", "旅遊/地圖", "醫療/保健", "生活風格/休閒", "其他"
     ];
 
+     // 分類對應圖片（請將路徑補上正確的圖檔）
+    $categoryImages = [
+        "文學/小說" => "category_icons/literature.jpg",
+        "心理勵志" => "category_icons/psychology.jpg",
+        "商業/理財" => "category_icons/business.jpg",
+        "藝術/設計" => "category_icons/art.jpg",
+        "人文/歷史/地理" => "category_icons/humanity.jpg",
+        "科學/科普/自然" => "category_icons/science.jpg",
+        "電腦/資訊" => "category_icons/computer.jpg",
+        "語言學習" => "category_icons/language.jpg",
+        "考試用書/教科書" => "category_icons/exam.jpg",
+        "童書/繪本" => "category_icons/children.jpg",
+        "漫畫/輕小說" => "category_icons/comic.jpg",
+        "旅遊/地圖" => "category_icons/travel.jpg",
+        "醫療/保健" => "category_icons/medical.jpg",
+        "生活風格/休閒" => "category_icons/life.jpg",
+        "其他" => "category_icons/other.jpg"
+    ];
+
     // 取得篩選條件
     $categoryFilter = isset($_GET['category']) ? $_GET['category'] : '';
     $sortOrder = isset($_GET['sort']) ? $_GET['sort'] : '';
@@ -268,7 +287,10 @@
                 <?php $firstRow = array_slice($categories, 0, 7); // 取前 7 個 ?>
                 <?php foreach ($firstRow as $category): ?>
                     <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
-                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                    style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <img src="<?php echo htmlspecialchars($categoryImages[$category]); ?>"
+                            alt="<?php echo htmlspecialchars($category); ?>"
+                            style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:5px;">
                         <?php echo htmlspecialchars($category); ?>
                     </a>
                 <?php endforeach; ?>
@@ -276,14 +298,17 @@
 
             <!-- 第二行按鈕 -->
             <div style="display: flex; justify-content: space-between;">
-                <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
-                <?php foreach ($secondRow as $category): ?>
-                    <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
-                       style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center;">
-                        <?php echo htmlspecialchars($category); ?>
-                    </a>
-                <?php endforeach; ?>
-            </div>
+        <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
+        <?php foreach ($secondRow as $category): ?>
+            <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
+               style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <img src="<?php echo htmlspecialchars($categoryImages[$category]); ?>"
+                     alt="<?php echo htmlspecialchars($category); ?>"
+                     style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:5px;">
+                <?php echo htmlspecialchars($category); ?>
+            </a>
+        <?php endforeach; ?>
+    </div>
         </div>
 
         <!-- 商品列表 -->

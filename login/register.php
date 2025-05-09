@@ -151,10 +151,10 @@
             const passwordField = document.getElementById(fieldId);
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                toggleElement.textContent = '👁️‍🗨️';
+                toggleElement.textContent = '👁️';
             } else {
                 passwordField.type = 'password';
-                toggleElement.textContent = '👁️';
+                toggleElement.textContent = '🙈';
             }
         }
     </script>
