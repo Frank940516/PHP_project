@@ -141,7 +141,7 @@
             const toggleButton = document.querySelector('.toggle-password');
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                toggleButton.textContent = '🙈';
+                toggleButton.textContent = '👁️‍🗨️';
             } else {
                 passwordField.type = 'password';
                 toggleButton.textContent = '👁️';

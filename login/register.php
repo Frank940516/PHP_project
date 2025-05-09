@@ -131,7 +131,7 @@
             <label for="email">郵件</label>
             <input type="email" id="email" name="email" required>
             <label for="username">用戶名稱</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="name" name="name" required>
             <label for="password">密碼</label>
             <div style="position: relative;">
                 <input type="password" id="password" name="password" required>
