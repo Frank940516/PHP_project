@@ -74,6 +74,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // 願望清單通知（比對書名與作者）
+        $sqlWish = "SELECT DISTINCT user_id FROM wish_list WHERE book_name = ? AND author = ?";
+        $stmtWish = mysqli_prepare($link, $sqlWish);
+        mysqli_stmt_bind_param($stmtWish, 'ss', $name, $author);
+        mysqli_stmt_execute($stmtWish);
+        $resWish = mysqli_stmt_get_result($stmtWish);
+        while ($wishUser = mysqli_fetch_assoc($resWish)) {
+            // 不通知自己
+            if ($wishUser['user_id'] == $userId) continue;
+
+            $notifyMsg = "您想要的書籍「{$name}」已有人上架，快去看看吧！";
+            $sqlNotify = "INSERT INTO notifications (user_id, message, product_id) VALUES (?, ?, ?)";
+            $stmtNotify = mysqli_prepare($link, $sqlNotify);
+            mysqli_stmt_bind_param($stmtNotify, 'isi', $wishUser['user_id'], $notifyMsg, $productId);
+            mysqli_stmt_execute($stmtNotify);
+        }
+
         // 新增成功，跳轉到商品管理頁面
         echo "<script>alert('商品新增成功！'); location.href='showList.php';</script>";
     } else {
