@@ -72,6 +72,17 @@ if (!$user) {
             .back-home-button {
                 margin-bottom: 20px;
             }
+            .back-home-button input[type="button"] {
+            background-color: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            }
+            .back-home-button input[type="button"]:hover {
+            background-color: #1565c0;
+            }
         </style>
     </head>
     <body>

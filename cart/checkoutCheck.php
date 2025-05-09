@@ -145,6 +145,28 @@ foreach ($orderItems as $it) {
         $it['subtotal']
     );
     mysqli_stmt_execute($stmtI);
+
+    // 查詢商品的賣家
+    $sqlSeller = "SELECT seller_id, name FROM products WHERE id = ?";
+    $stmtSeller = mysqli_prepare($link, $sqlSeller);
+    mysqli_stmt_bind_param($stmtSeller, 'i', $it['product_id']);
+    mysqli_stmt_execute($stmtSeller);
+    $resultSeller = mysqli_stmt_get_result($stmtSeller);
+    $seller = mysqli_fetch_assoc($resultSeller);
+
+    if ($seller) {
+        $buyerName = $_SESSION['name'];
+        $productName = $seller['name'];
+        $sellerId = $seller['seller_id'];
+
+        // 存純文字
+        $notificationMessage = "買家 {$buyerName} 購買了您的商品 {$productName}，數量：{$it['quantity']}。";
+
+        $sqlNotification = "INSERT INTO notifications (user_id, message) VALUES (?, ?)";
+        $stmtNotification = mysqli_prepare($link, $sqlNotification);
+        mysqli_stmt_bind_param($stmtNotification, 'is', $sellerId, $notificationMessage);
+        mysqli_stmt_execute($stmtNotification);
+    }
 }
 
 // 清空購物車
