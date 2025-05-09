@@ -14,11 +14,11 @@ if (isset($_SESSION["user"])) {
                 <li><a href="/php_project/product/sellHistory.php">訂單紀錄</a></li>
                 <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
                 <?php if ($_SESSION["type"] === "Admin"): ?>
-                    <li><a href="/admin/userManagement.php">使用者管理</a></li>
-                    <li><a href="/admin/productManagement.php">商品管理</a></li>
-                    <li><a href="/admin/orderHistory.php">交易紀錄</a></li>
-                    <li><a href="../coupon/addCoupon.php">新增優惠券</a></li>
-                    <li><a href="/admin/couponHistory.php">優惠券紀錄</a></li>
+                    <li><a href="/php_project/admin/userManagement.php">使用者管理</a></li>
+                    <li><a href="/php_project/admin/productManagement.php">商品管理</a></li>
+                    <li><a href="/php_project/admin/orderHistory.php">交易紀錄</a></li>
+                    <li><a href="/php_project/coupon/addCoupon.php">新增優惠券</a></li>
+                    <li><a href="/php_project/admin/couponHistory.php">優惠券紀錄</a></li>
                     <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;"> <!-- 分隔線 -->
                 <?php endif; ?>
                 <li><a href="/php_project/login/logout.php">登出</a></li>
