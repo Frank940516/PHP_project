@@ -126,17 +126,30 @@
             }
         }
         ?>
-        <form class="login-form" action="loginCheck.php" method="POST">
+         <form class="login-form" action="loginCheck.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <input type="hidden" name="redirect" value="<?php echo isset($_GET['redirect']) ? htmlspecialchars($_GET['redirect']) : '../index.php'; ?>">
             <label for="email">郵件</label>
             <input type="text" id="email" name="email" required>
             <label for="password">密碼</label>
-            <div class="password-container">
+            <div style="position: relative;">
                 <input type="password" id="password" name="password" required>
-                <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                <button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁️</button>
             </div>
             <input class="login-btn" type="submit" value="登入">
         </form>
-    </body>
+    </div>
+    <script>
+        function togglePassword(fieldId, toggleElement) {
+            const passwordField = document.getElementById(fieldId);
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleElement.textContent = '👁️';
+            } else {
+                passwordField.type = 'password';
+                toggleElement.textContent = '🙈';
+            }
+        }
+    </script>
+</body>
 </html>
