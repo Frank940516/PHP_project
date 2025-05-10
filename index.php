@@ -282,34 +282,38 @@
 
         <!-- 類別按鈕 -->
         <div>
+            <div>
             <!-- 第一行按鈕 -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                 <?php $firstRow = array_slice($categories, 0, 7); // 取前 7 個 ?>
                 <?php foreach ($firstRow as $category): ?>
                     <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
-                    style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <img src="<?php echo htmlspecialchars($categoryImages[$category]); ?>"
-                            alt="<?php echo htmlspecialchars($category); ?>"
-                            style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:5px;">
-                        <?php echo htmlspecialchars($category); ?>
+                    style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                        <div style="width:80px; height:80px; border-radius:50%; overflow:hidden; position:relative; margin-bottom:5px;">
+                            <img src="<?php echo htmlspecialchars($categoryImages[$category]); ?>"
+                                alt="<?php echo htmlspecialchars($category); ?>"
+                                style="width:100%; height:100%; object-fit:cover; position:absolute; left:0; top:0;">
+                        </div>
+                        <span style="position: relative; z-index: 1;"><?php echo htmlspecialchars($category); ?></span>
                     </a>
                 <?php endforeach; ?>
             </div>
 
             <!-- 第二行按鈕 -->
             <div style="display: flex; justify-content: space-between;">
-        <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
-        <?php foreach ($secondRow as $category): ?>
-            <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
-               style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <img src="<?php echo htmlspecialchars($categoryImages[$category]); ?>"
-                     alt="<?php echo htmlspecialchars($category); ?>"
-                     style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:5px;">
-                <?php echo htmlspecialchars($category); ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
-        </div>
+                <?php $secondRow = array_slice($categories, 7); // 取後 8 個 ?>
+                <?php foreach ($secondRow as $category): ?>
+                    <a href="index.php?category=<?php echo ($categoryFilter === $category) ? '' : urlencode($category); ?>" 
+                    style="flex: 1; margin: 5px; width: 80px; height: 80px; border-radius: 50%; background-color: <?php echo ($categoryFilter === $category) ? '#007BFF' : '#f0f0f0'; ?>; text-decoration: none; color: <?php echo ($categoryFilter === $category) ? 'white' : '#333'; ?>; font-size: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                        <div style="width:80px; height:80px; border-radius:50%; overflow:hidden; position:relative; margin-bottom:5px;">
+                            <img src="<?php echo htmlspecialchars($categoryImages[$category]); ?>"
+                                alt="<?php echo htmlspecialchars($category); ?>"
+                                style="width:100%; height:100%; object-fit:cover; position:absolute; left:0; top:0;">
+                        </div>
+                        <span style="position: relative; z-index: 1;"><?php echo htmlspecialchars($category); ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
 
         <!-- 商品列表 -->
         <div class="product-grid">
