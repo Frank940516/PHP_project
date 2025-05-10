@@ -108,24 +108,28 @@
             margin-bottom: 18px;
         }
     </style>
-</head>
-<body>
+    </head>
+    <body>
     <div class="login-container">
         <div class="login-title">登入</div>
-        <?php
-        echo "已有帳號？請在此登入：<br>";
+    <?php
+    echo "已有帳號？請在此登入：<br>";
 
-        if (isset($_GET['error'])) {
-            if ($_GET['error'] === 'blocked') {
-                $reason = isset($_GET['reason']) ? htmlspecialchars(urldecode($_GET['reason'])) : '無具體原因';
-                echo "<p style='color: red;'>登入失敗，已被管理員封鎖。原因：$reason</p>";
-            } elseif ($_GET['error'] === 'password') {
-                echo "<p style='color: red;'>密碼錯誤，請再試一次。</p>";
-            } elseif ($_GET['error'] === 'email') {
-                echo "<p style='color: red;'>帳號不存在，請檢查電子郵件。</p>";
-            }
+    if (isset($_GET['error'])) {
+        if ($_GET['error'] === 'blocked') {
+            $reason = isset($_GET['reason']) ? htmlspecialchars(urldecode($_GET['reason'])) : '無具體原因';
+            echo "<p style='color: red;'>登入失敗，已被管理員封鎖。原因：$reason</p>";
+        } elseif ($_GET['error'] === 'password') {
+        echo "<p style='color: red;'>密碼錯誤，請再試一次。</p>";
+        } elseif ($_GET['error'] === 'email') {
+        echo "<p style='color: red;'>帳號不存在，請檢查電子郵件。</p>";
+        } elseif ($_GET['error'] === 'invalid_credentials') {
+        echo "<p style='color: red;'>帳號或密碼錯誤，請再試一次。</p>";
+        } else {
+        echo "<p style='color: red;'>登入失敗，請再試一次。</p>";
         }
-        ?>
+        }
+    ?>
         <form class="login-form" action="loginCheck.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <input type="hidden" name="redirect" value="<?php echo isset($_GET['redirect']) ? htmlspecialchars($_GET['redirect']) : '../index.php'; ?>">
