@@ -107,39 +107,51 @@
             position: relative;
             margin-bottom: 18px;
         }
+        
+        .error-message {
+            color: #fff;
+            background: #e53935;
+            padding: 10px 0;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
     </style>
     </head>
     <body>
     <div class="login-container">
         <div class="login-title">登入</div>
-    <?php
-    echo "已有帳號？請在此登入：<br>";
-
-    if (isset($_GET['error'])) {
-        if ($_GET['error'] === 'blocked') {
-            $reason = isset($_GET['reason']) ? htmlspecialchars(urldecode($_GET['reason'])) : '無具體原因';
-            echo "<p style='color: red;'>登入失敗，已被管理員封鎖。原因：$reason</p>";
-        } elseif ($_GET['error'] === 'password') {
-        echo "<p style='color: red;'>密碼錯誤，請再試一次。</p>";
-        } elseif ($_GET['error'] === 'email') {
-        echo "<p style='color: red;'>帳號不存在，請檢查電子郵件。</p>";
-        } elseif ($_GET['error'] === 'invalid_credentials') {
-        echo "<p style='color: red;'>帳號或密碼錯誤，請再試一次。</p>";
-        } else {
-        echo "<p style='color: red;'>登入失敗，請再試一次。</p>";
+        <?php
+        if (isset($_GET['error'])) {
+            if ($_GET['error'] === 'blocked') {
+                $reason = isset($_GET['reason']) ? htmlspecialchars(urldecode($_GET['reason'])) : '無具體原因';
+                echo "<div class='error-message'>登入失敗，已被管理員封鎖。原因：$reason</div>";
+            } elseif ($_GET['error'] === 'password') {
+                echo "<div class='error-message'>密碼錯誤，請再試一次。</div>";
+            } elseif ($_GET['error'] === 'email') {
+                echo "<div class='error-message'>帳號不存在，請檢查電子郵件。</div>";
+            } elseif ($_GET['error'] === 'invalid_credentials') {
+                echo "<div class='error-message'>帳號或密碼錯誤，請再試一次。</div>";
+            } else {
+                echo "<div class='error-message'>登入失敗，請再試一次。</div>";
+            }
         }
-        }
-    ?>
+        ?>
         <form class="login-form" action="loginCheck.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <input type="hidden" name="redirect" value="<?php echo isset($_GET['redirect']) ? htmlspecialchars($_GET['redirect']) : '../index.php'; ?>">
             <label for="email">郵件</label>
-            <input type="text" id="email" name="email" required>
+            <input type="email" id="email" name="email" required>
             <label for="password">密碼</label>
             <div class="password-container">
                 <input type="password" id="password" name="password" required>
                 <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
             </div>
+            <input class="login-btn" type="submit" value="登入">
+        </form>
+    </div>
             <input class="login-btn" type="submit" value="登入">
         </form>
     </body>
