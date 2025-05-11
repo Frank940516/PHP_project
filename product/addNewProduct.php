@@ -1,6 +1,6 @@
 <?php
 require('../db.inc'); // 資料庫連線檔案
-require('../login/authCheck.php'); 
+require('../authCheck.php'); 
 mysqli_set_charset($link, 'utf8');
 
 // 檢查是否登入
@@ -8,35 +8,7 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../login/login.php");
     exit();
 }
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $author = $_POST['author'];
-    $price = $_POST['price'];
-    $stock = $_POST['stock'];
-    $condition = $_POST['condition'];
-    $category = $_POST['category'];
-    $description = $_POST['description'];
-    $attachment = $_FILES['attachment'];
-
-    if ($attachment['error'] === UPLOAD_ERR_OK) {
-        $targetDir = "../uploads/";
-        $targetFile = $targetDir . basename($attachment['name']);
-        move_uploaded_file($attachment['tmp_name'], $targetFile);
-    } else {
-        echo "圖片上傳失敗";
-        exit();
-    }
-
-    $stmt = $link->prepare("INSERT INTO products (name, author, price, stock, condition, category, description, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssdisiss", $name, $author, $price, $stock, $condition, $category, $description, $targetFile);
-    $stmt->execute();
-
-    header("Location: product_list.php");
-    exit();
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -63,14 +35,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         label {
             display: block;
-            margin-top: 10px;
+            margin-bottom: 8px;
             font-weight: bold;
         }
         input, textarea, select {
             width: 100%;
             padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
@@ -88,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <!-- Top bar with back home button and user menu -->
     <div class="top-bar">
         <div class="back-home-button">
             <input type="button" value="返回首頁" onclick="location.href='../index.php'">
@@ -96,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <h1>新增商品</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" action="addCheck.php" enctype="multipart/form-data">
         <label for="name">商品名稱</label>
         <input type="text" id="name" name="name" required>
 

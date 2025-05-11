@@ -2,7 +2,7 @@
 if (isset($_SESSION["user"])) {
     ?>
     <div class="user-menu">
-        <span class="user-name" onclick="toggleMenu()"><?php echo htmlspecialchars($_SESSION["name"]); ?> ▼</span>
+        <span class="name" onclick="toggleMenu()"><?php echo htmlspecialchars($_SESSION["name"]); ?> ▼</span>
         <div class="menu-dropdown" id="menuDropdown">
             <ul>
                 <li><a href="/profile/profile.php">編輯個人資料</a></li>

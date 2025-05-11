@@ -97,6 +97,7 @@
             .filter-dropdown {
                 position: relative;
                 display: inline-block;
+                z-index: 100;
             }
             .filter-button {
                 background-color: #007BFF;

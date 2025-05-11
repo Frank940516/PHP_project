@@ -136,7 +136,7 @@
             <label for="email">郵件</label>
             <input type="email" id="email" name="email" maxlength="255" required>
             <label for="username">用戶名稱</label>
-            <input type="text" id="name" name="name" required>
+            <input type="text" id="username" name="username" maxlength="50" required>
             <label for="password">密碼</label>
             <div style="position: relative;">
                 <input type="password" id="password" name="password" maxlength="128" required>
@@ -156,10 +156,10 @@
             const passwordField = document.getElementById(fieldId);
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                toggleElement.textContent = '👁️';
+                toggleElement.textContent = '👁️‍🗨️';
             } else {
                 passwordField.type = 'password';
-                toggleElement.textContent = '🙈';
+                toggleElement.textContent = '👁️';
             }
         }
     </script>
