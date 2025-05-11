@@ -1,10 +1,10 @@
 <?php
-    require('../db.inc');
-    mysqli_set_charset($link, 'utf8');
-    session_start();
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
+require('../db.inc');
+mysqli_set_charset($link, 'utf8');
+session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -45,8 +45,7 @@
             color: #444;
             font-size: 1rem;
         }
-        .login-form input[type="text"],
-        .login-form input[type="password"] {
+        .login-form input[type="email"] {
             width: 100%;
             padding: 10px 12px;
             margin-bottom: 18px;
@@ -55,12 +54,49 @@
             font-size: 1rem;
             background: #fafbfc;
             transition: border 0.2s;
+            box-sizing: border-box;
         }
-        .login-form input[type="text"]:focus,
-        .login-form input[type="password"]:focus {
+        .login-form input[type="email"]:focus {
             border: 1.5px solid #1976d2;
             outline: none;
             background: #fff;
+        }
+        .password-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .password-container input[type="password"],
+        .password-container input[type="text"] {
+            flex: 1;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #fafbfc;
+            transition: border 0.2s;
+            box-sizing: border-box;
+            padding-right: 38px;
+        }
+        .password-container input[type="password"]:focus,
+        .password-container input[type="text"]:focus {
+            border: 1.5px solid #1976d2;
+            outline: none;
+            background: #fff;
+        }
+        .toggle-password {
+            margin-left: -36px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #1976d2;
+            z-index: 2;
+        }
+        .toggle-password:hover {
+            color: #1565c0;
         }
         .login-form .login-btn {
             width: 100%;
@@ -89,25 +125,6 @@
         .register-link:hover {
             text-decoration: underline;
         }
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            color: #1976d2;
-        }
-        .toggle-password:hover {
-            color: #1565c0;
-        }
-        .password-container {
-            position: relative;
-            margin-bottom: 18px;
-        }
-        
         .error-message {
             color: #fff;
             background: #e53935;
@@ -119,8 +136,8 @@
             letter-spacing: 1px;
         }
     </style>
-    </head>
-    <body>
+</head>
+<body>
     <div class="login-container">
         <div class="login-title">登入</div>
         <?php
@@ -145,25 +162,23 @@
             <label for="email">郵件</label>
             <input type="email" id="email" name="email" required>
             <label for="password">密碼</label>
-            <div style="position: relative;">
+            <div class="password-container">
                 <input type="password" id="password" name="password" required>
-                <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                <button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁️</button>
             </div>
             <input class="login-btn" type="submit" value="登入">
         </form>
-    </div>
-            <input class="login-btn" type="submit" value="登入">
-        </form>
+        <a class="register-link" href="register.php">還沒有帳號？註冊</a>
     </div>
     <script>
         function togglePassword(fieldId, toggleElement) {
             const passwordField = document.getElementById(fieldId);
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                toggleElement.textContent = '👁️';
+                toggleElement.textContent = '🙈';
             } else {
                 passwordField.type = 'password';
-                toggleElement.textContent = '🙈';
+                toggleElement.textContent = '👁️';
             }
         }
     </script>
