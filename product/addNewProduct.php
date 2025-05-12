@@ -1,6 +1,6 @@
 <?php
 require('../db.inc'); // 資料庫連線檔案
-require('../authCheck.php'); 
+require('../login/authCheck.php'); 
 mysqli_set_charset($link, 'utf8');
 
 // 檢查是否登入
@@ -76,7 +76,7 @@ if (!isset($_SESSION['user'])) {
         <input type="text" id="author" name="author" required>
 
         <label for="price">價格</label>
-        <input type="number" id="price" name="price" step="0.01" required>
+        <input type="number" id="price" name="price" step="1" required>
 
         <label for="stock">庫存</label>
         <input type="number" id="stock" name="stock" required>
