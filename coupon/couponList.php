@@ -1,4 +1,4 @@
-<?php //admin parts not fully fixed (:
+<?php
 require('../db.inc');
 session_start(); // 確保啟用 session
 mysqli_set_charset($link, 'utf8');
@@ -80,10 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['redeem_code'])) {
 
 // 查詢優惠券
 if ($isAdmin) {
-    $sql = "SELECT id, code, discount, discount_type, start_date, expiration_date, is_active, redeem_count, redeem_limit 
-            FROM coupons 
-            WHERE is_active IN (1, 2) -- 包含生效和未生效的優惠券
-            ORDER BY start_date ASC, expiration_date ASC";
+    $sql = "SELECT 
+                c.id, c.code, c.discount, c.discount_type, c.start_date, c.expiration_date, 
+                c.is_active, c.redeem_count, c.redeem_limit,
+                (SELECT COUNT(*) FROM orders o WHERE o.coupon_code = c.code) AS used_count
+            FROM coupons c
+            WHERE c.is_active IN (1, 2)
+            ORDER BY c.start_date ASC, c.expiration_date ASC";
     $stmt = mysqli_prepare($link, $sql);
 } else {
     $sql = "SELECT c.id, c.code, c.discount, c.discount_type, c.start_date, c.expiration_date, c.is_active 
@@ -264,6 +267,7 @@ $resultUsedCoupons = mysqli_stmt_get_result($stmtUsedCoupons);
                     <?php if ($isAdmin): ?>
                         <th>生效狀態</th>
                         <th>兌換次數</th>
+                        <th>實際使用次數</th> <!-- 新增 -->
                         <th>操作</th>
                     <?php endif; ?>
                 </tr>
@@ -300,6 +304,7 @@ $resultUsedCoupons = mysqli_stmt_get_result($stmtUsedCoupons);
                                 <?php endif; ?>
                             </td>
                             <td><?php echo htmlspecialchars($row['redeem_count']); ?> / <?php echo htmlspecialchars($row['redeem_limit']); ?></td>
+                            <td><?php echo htmlspecialchars($row['used_count']); ?></td> <!-- 新增 -->
                             <td>
                                 <form action="editCoupon.php" method="GET" style="display: inline;">
                                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
