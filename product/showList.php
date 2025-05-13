@@ -90,12 +90,15 @@ while ($row = mysqli_fetch_assoc($resultProducts)) {
             background-color: #f2f2f2;
         }
         .action-buttons a {
-            margin-right: 10px;
+            display: block;
+            margin-right: 0;
+            margin-bottom: 8px;
             text-decoration: none;
             color: white;
             background-color: #007BFF;
             padding: 5px 10px;
             border-radius: 5px;
+            text-align: center;
         }
         .action-buttons a:hover {
             background-color: #0056b3;
