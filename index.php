@@ -70,13 +70,14 @@
         <title>二手書交易平台-首頁</title>
         <style>
             .top-bar {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 20px;
-                background-color: #f8f9fa;
-                border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end; /* 右側對齊 */
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
             }
+                    
             .announcement-button {
                 background-color: #007BFF;
                 color: white;
@@ -93,6 +94,7 @@
             .top-right-buttons {
                 display: flex;
                 gap: 10px;
+                align-items: center;
             }
             .filter-dropdown {
                 position: relative;
@@ -203,9 +205,9 @@
     </head>
     <body>
         <div class="top-bar">
-            <a href="announcement/announcement.php" class="announcement-button">公告</a>
             <div class="top-right-buttons">
                 <?php include('userMenu.php'); ?>
+                <a href="announcement/announcement.php" class="announcement-button">公告</a>
             </div>
         </div>
 
