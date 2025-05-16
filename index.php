@@ -187,7 +187,8 @@
                 margin: 10px 0;
             }
             .product-item a {
-                display: inline-block;
+                display: block;           /* 讓 a 變成區塊元素 */
+                width: 100%;              /* 寬度佔滿父層 */
                 margin: 10px 0;
                 padding: 8px 15px;
                 background-color: #4CAF50;
@@ -195,6 +196,9 @@
                 text-decoration: none;
                 border-radius: 4px;
                 font-size: 14px;
+                box-sizing: border-box;   /* 讓 padding 不會超出寬度 */
+                text-align: center;       /* 文字置中 */
+                transition: background 0.2s;
             }
             .product-item a:hover {
                 background-color: #45a049;
@@ -323,7 +327,7 @@
                     <div class="product-item">
                         <img src="product/pic/<?php echo htmlspecialchars($product['attachment']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                         <h3>
-                            <a href="product/detail.php?id=<?php echo $product['id']; ?>" style="text-decoration: underline; color: blue;">
+                            <a href="product/detail.php?id=<?php echo $product['id']; ?>" style="color: blue; text-decoration: none;">
                                 <?php echo htmlspecialchars($product['name']); ?>
                             </a>
                         </h3>
