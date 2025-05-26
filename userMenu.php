@@ -1,7 +1,7 @@
 <?php
 if (isset($_SESSION["user"])) {
     ?>
-    <div class="sidebar-menu" id="sidebarMenu">
+    <div class="sidebar-menu collapsed" id="sidebarMenu">
         <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
         <div class="sidebar-content" id="sidebarContent">
             <div class="sidebar-user">
@@ -41,6 +41,9 @@ if (isset($_SESSION["user"])) {
             flex-direction: column;
         }
         .sidebar-toggle {
+            position: absolute;
+            top: 0;      /* 回到最左上角 */
+            left: 0;
             background: #1976d2;
             color: #fff;
             border: none;
@@ -48,8 +51,32 @@ if (isset($_SESSION["user"])) {
             padding: 12px 16px;
             font-size: 22px;
             cursor: pointer;
-            margin: 10px 0 0 0;
+            margin: 0;
             outline: none;
+            transition: all 0.2s;
+            z-index: 2100;
+        }
+        .sidebar-menu.collapsed {
+            width: auto;
+            background: transparent;
+            pointer-events: none; /* 只讓按鈕可點 */
+        }
+        .sidebar-menu.collapsed .sidebar-toggle {
+            width: 40px;
+            height: 40px;
+            padding: 8px 8px;
+            font-size: 18px;
+            border-radius: 50%;
+            margin: 0;
+            position: absolute;
+            top: 0;   /* 回到最左上角 */
+            left: 0;
+            z-index: 2100;
+            pointer-events: auto;
+        }
+        .sidebar-menu.collapsed .sidebar-content,
+        .sidebar-menu.collapsed .sidebar-user {
+            display: none !important;
         }
         .sidebar-content {
             background: #fff;
